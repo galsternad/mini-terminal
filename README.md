@@ -8,4 +8,5 @@ Implementing a simple terminal-like interface in JS. Currently supports:
 - ```ls```,
 - ```pwd```,
 - ```write```,
-- ```cat```.
+- ```cat```,
+- ```tree```

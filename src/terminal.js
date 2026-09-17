@@ -115,17 +115,17 @@ function pwd() {
   return currentWorkingDirectoryArr
     .reverse()
     .join("/")
-    .slice(1);
+    .slice(1) + "/";
 }
 
 function ls() {
-  let str = "";
+  let array = [];
 
   for(let key of cwd.children.keys()) {
-    str += key + " ";
+    array.push(key);
   }
 
-  return str;
+  return array.join("\n");
 };
 
 function mkdir(directoryName) {
@@ -238,21 +238,93 @@ function cat(fileName) {
   return true;
 };
 
-touch("app.js"); 
-console.log(ls()); 
-cat("app.js"); 
-write("app.js", "Hello!"); 
-write("app.js", "Hello!"); 
-cat("app.js");
-rm("app.js");
-mkdir("to_delete");
-mkdir("not_to_delete");
-console.log(ls());
-rmdir("to_delete");
-rmdir("to_delete");
-console.log(ls());
+function wc(fileName) {
+  let file = getFile(fileName);
+
+  if(file === null) {
+    return `'${fileName}' does not exist!`;
+  }
+
+  return file.content.length;
+};
+
+function tree() {
+  let directory = cwd;
+  let directoryName = pwd() + "\n----------------\n";
+  const depth = 0;
+
+  return callTreeRecursive(directory, directoryName, depth);
+}
+
+function buildTreeString(child, depth) {
+  let str = "";
+
+  // indent
+  for(let i = 0; i < depth * 2; i++) {
+    str += " ";
+  }
+
+  str += child.name;
+
+  if(child.type === "directory") {
+    str += "/";
+  }
+  
+  str += "\n";
+
+  return str;
+}
+
+function callTreeRecursive(directory, str, depth) {
+  for(let child of directory.children.values()) {
+    str += buildTreeString(child, depth);
+    
+    if(child.type === "directory") {
+      str = callTreeRecursive(child, str, depth + 1);
+    }
+  }
+
+  return str;
+};
+
+function find(target, directory, str) {
+  for(let child of directory.children.values()) {
+    if(child.name.includes(target)) {
+      console.log(child.name);
+    }
+
+    if(child.type === "directory") {
+      str = find(target, child, str);
+    }
+  }
+
+  return str;
+};
+
+function help(command) {
+
+};
+
+touch("app1.js");
+touch("app2.js");
+touch("app3.js");
+mkdir("dir_1");
+mkdir("dir_2");
+mkdir("dir_3");
+mkdir("dir_4");
+mkdir("dir_5");
+touch("app4.js");
+cd("dir_1");
+touch("file1.js");
+touch("file2.js");
+touch("file3.js");
+mkdir("dir_dir_1");
+mkdir("dir_dir_2");
+cd("dir_dir_2");
+touch("file1.js");
+touch("file2.js");
 cd("..");
-console.log(ls());
-mkdir("new_dir");
-cd("new_dir");
-touch("new_file.js");
+cd("..");
+console.log(tree());
+let findStr = find("app4.js", root, "");
+console.log(`string found: ${findStr}`)
