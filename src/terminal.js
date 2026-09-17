@@ -45,7 +45,7 @@ function isDirectory(directoryName) {
 }
 
 function checkIfDirectoryExists(directoryName) {
-  return cwd.children.has(directoryName);
+  return cwd.children.has(directoryName) && isDirectory(directoryName);
 }
 
 function isFile(fileName) {
@@ -53,78 +53,50 @@ function isFile(fileName) {
 }
 
 function checkIfFileExists(fileName) {
-  return cwd.children.has(fileName);
+  return cwd.children.has(fileName) && isFile(fileName);
 }
 
 function getDirectory(directoryName) {
   if(!checkIfDirectoryExists(directoryName)) {
-    console.log(`Directory '${directoryName}' does not exist!`);
-    
-    return null;
-  }
-
-  if(!isDirectory(directoryName)) {
-    console.log(`'${directoryName}' is not a directory!`);
-    
     return null;
   }
 
   return cwd.children.get(directoryName);
 }
 
-function getFile(fileName) {
-  if(!checkIfFileExists(fileName)) {
-    console.log(`File '${fileName}' does not exist!`);
-    
-    return null;
+function canRemoveDirectory(directoryName) {
+  let directory = getDirectory(directoryName);
+
+  if(directory === null) {
+    return false;
   }
 
-  if(!isFile(fileName)) {
-    console.log(`'${fileName}' is not a file!`);
+  if(directory.children.size !== 0) {
+    console.log(`Cannot delete a non-empty directory!`);
     
+    return false;
+  }
+
+  return true;
+}
+
+function getFile(fileName) {
+  if(!checkIfFileExists(fileName)) {
     return null;
   }
 
   return cwd.children.get(fileName)
 }
 
-function mkdir(directoryName) {
-  if(checkIfDirectoryExists(directoryName)) {
-    console.log(`Directory '${directoryName}' already exists!`);
+function canRemoveFile(fileName) {
+  let file = getFile(fileName);
 
+  if(file === null) {
     return false;
   }
 
-  let newDirectory = new Directory(directoryName, cwd);
-  cwd.children.set(directoryName, newDirectory);
-  console.log(`Directory '${directoryName}' created!`);
-
   return true;
-};
-
-function touch(fileName) {
-  if(checkIfFileExists(fileName)) {
-    console.log(`File '${fileName}' already exists!`);
-
-    return false;
-  }
-
-  let newFile = new File(fileName, cwd);
-  cwd.children.set(fileName, newFile);
-  console.log(`File '${fileName}' created!`);
-
-  return true;
-};
-
-function ls() {
-  let str = "";
-
-  for(let key of cwd.children.keys()) {
-    str += key + " ";
-  }
-
-  return str;
-};
+}
 
 function pwd() {
   if(cwd === root) {
@@ -144,6 +116,70 @@ function pwd() {
     .reverse()
     .join("/")
     .slice(1);
+}
+
+function ls() {
+  let str = "";
+
+  for(let key of cwd.children.keys()) {
+    str += key + " ";
+  }
+
+  return str;
+};
+
+function mkdir(directoryName) {
+  if(checkIfDirectoryExists(directoryName)) {
+    console.log(`Directory '${directoryName}' already exists!`);
+
+    return false;
+  }
+
+  let newDirectory = new Directory(directoryName, cwd);
+  cwd.children.set(directoryName, newDirectory);
+  console.log(`Directory '${directoryName}' created!`);
+  cwd.lastModified = Date.now();
+
+  return true;
+};
+
+function rmdir(directoryName) {
+  if(!canRemoveDirectory(directoryName)) {
+    return false;
+  }
+
+  cwd.children.delete(directoryName);
+  console.log(`'${directoryName}' successfully deleted!`);
+  cwd.lastModified = Date.now();
+
+  return true;
+}
+
+function touch(fileName) {
+  if(checkIfFileExists(fileName)) {
+    console.log(`File '${fileName}' already exists!`);
+
+    return false;
+  }
+
+  let newFile = new File(fileName, cwd);
+  cwd.children.set(fileName, newFile);
+  console.log(`File '${fileName}' created!`);
+  cwd.lastModified = Date.now();
+
+  return true;
+};
+
+function rm(fileName) {
+  if(!canRemoveFile(fileName)) {
+    return false;
+  }
+
+  cwd.children.delete(fileName);
+  console.log(`'${fileName}' successfully deleted!`);
+  cwd.lastModified = Date.now();
+
+  return true;
 }
 
 function cd(directoryName) {
@@ -201,3 +237,22 @@ function cat(fileName) {
 
   return true;
 };
+
+touch("app.js"); 
+console.log(ls()); 
+cat("app.js"); 
+write("app.js", "Hello!"); 
+write("app.js", "Hello!"); 
+cat("app.js");
+rm("app.js");
+mkdir("to_delete");
+mkdir("not_to_delete");
+console.log(ls());
+rmdir("to_delete");
+rmdir("to_delete");
+console.log(ls());
+cd("..");
+console.log(ls());
+mkdir("new_dir");
+cd("new_dir");
+touch("new_file.js");
