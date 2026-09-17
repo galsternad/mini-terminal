@@ -115,7 +115,7 @@ function pwd() {
   return currentWorkingDirectoryArr
     .reverse()
     .join("/")
-    .slice(1) + "/";
+    .slice(1);
 }
 
 function ls() {
@@ -245,7 +245,19 @@ function wc(fileName) {
     return `'${fileName}' does not exist!`;
   }
 
-  return file.content.length;
+  let fileContent = file.content.replace(/\s+/g, " ").trim();
+  let words = [];
+  let characters = fileContent.length;
+
+  if(fileContent !== "") {
+    words = fileContent.split(" ").length;
+  } else {
+    words = 0;
+  }
+
+  let result = `characters: ${characters}\nwords: ${words}`;
+
+  return result;
 };
 
 function tree() {
@@ -258,9 +270,10 @@ function tree() {
 
 function buildTreeString(child, depth) {
   let str = "";
+  const indent = 2;
 
   // indent
-  for(let i = 0; i < depth * 2; i++) {
+  for(let i = 0; i < depth * indent; i++) {
     str += " ";
   }
 
@@ -269,7 +282,7 @@ function buildTreeString(child, depth) {
   if(child.type === "directory") {
     str += "/";
   }
-  
+
   str += "\n";
 
   return str;
@@ -287,14 +300,46 @@ function callTreeRecursive(directory, str, depth) {
   return str;
 };
 
-function find(target, directory, str) {
+function find(target) {
+  let directory = cwd;
+  let result = callFindRecursive(target, directory, "");
+
+  if(result.length === 0) {
+    return `Couldn't find '${target}'!`;
+  }
+
+  return `Found '${target}':\n` + result;
+}
+
+function buildFindString(child) {
+  let currentWorkingDirectory = child.parent;
+  let currentWorkingDirectoryArr = [];
+  
+  if(currentWorkingDirectory === root) {
+    return "/" + child.name + "\n";
+  }
+  
+  currentWorkingDirectoryArr.push(currentWorkingDirectory.name);
+
+  while(currentWorkingDirectory.parent != null) {
+    currentWorkingDirectory = currentWorkingDirectory.parent;
+    currentWorkingDirectoryArr.push(currentWorkingDirectory.name);
+  }
+
+  return currentWorkingDirectoryArr
+    .reverse()
+    .join("/")
+    .slice(1) + "/" + child.name + "\n";
+}
+
+function callFindRecursive(target, directory, str) {
   for(let child of directory.children.values()) {
     if(child.name.includes(target)) {
-      console.log(child.name);
+      str += buildFindString(child);
     }
 
     if(child.type === "directory") {
-      str = find(target, child, str);
+      str = callFindRecursive(target, child, str);
     }
   }
 
@@ -325,6 +370,7 @@ touch("file1.js");
 touch("file2.js");
 cd("..");
 cd("..");
+cd("dir_1");
 console.log(tree());
-let findStr = find("app4.js", root, "");
-console.log(`string found: ${findStr}`)
+let findStr = find("file1.js");
+console.log(`${findStr}`)

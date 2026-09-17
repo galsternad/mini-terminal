@@ -9,4 +9,5 @@ Implementing a simple terminal-like interface in JS. Currently supports:
 - ```pwd```,
 - ```write```,
 - ```cat```,
-- ```tree```
+- ```tree```,
+- ```find```.
