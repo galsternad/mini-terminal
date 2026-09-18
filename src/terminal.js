@@ -2,7 +2,8 @@
 
 const ROOT = new Directory("/");
 const EMPTY_STRING = "";
-const TOO_MANY_ARGUMENTS = "Too many arguments!";
+const EXACT_NUMBER_OF_OPTIONS = "Command has to have an exact number of options!";
+const TOO_MANY_OPTIONS = "Too many options!";
 
 let cwd = ROOT;
 
@@ -20,7 +21,7 @@ function Directory(
   this.children = children;
   this.createdAt = createdAt;
   this.lastModified = lastModified;
-};
+}
 
 function File(
   name,
@@ -36,7 +37,7 @@ function File(
   this.content = content;
   this.createdAt = createdAt;
   this.lastModified = lastModified;
-};
+}
 
 function isRootDirectory() {
   return cwd === ROOT;
@@ -127,26 +128,32 @@ function pwd() {
 // TODO: 
 // return same type
 function pwdParse(options) {
-  if(options.length > 0) {
-    return TOO_MANY_ARGUMENTS;
+  const numOfOptions = 0;
+
+  if(!exactNumberOfOptions(options, numOfOptions)) {
+    return EXACT_NUMBER_OF_OPTIONS;
   }
+
+  let result = pwd();
 
   return result;
 }
 
 function ls() {
-  let array = [];
+  let result = [];
 
   for(let key of cwd.children.keys()) {
-    array.push(key);
+    result.push(key);
   }
 
-  return array;
-};
+  return result.join("\n");
+}
 
 function lsParse(options) {
-  if(options.length > 0) {
-    return TOO_MANY_ARGUMENTS;
+  const numOfOptions = 0;
+  
+  if(!exactNumberOfOptions(options, numOfOptions)) {
+    return EXACT_NUMBER_OF_OPTIONS;
   }
 
   return ls();
@@ -165,7 +172,27 @@ function mkdir(directoryName) {
   cwd.lastModified = Date.now();
 
   return true;
-};
+}
+
+function mkdirParse(options) {
+  const numOfOptions = 1;
+  
+  if(!exactNumberOfOptions(options, numOfOptions)) {
+    return EXACT_NUMBER_OF_OPTIONS;
+  }
+  
+  let newDirectoryName = options[0];
+  let result = mkdir(newDirectoryName);
+
+  const couldNotCreateDirectory = `Could not create directory '${newDirectoryName}'!`;
+  const directoryCreatedSuccesfully = `Directory '${newDirectoryName}' created!`;
+
+  if(!result) {  
+    return couldNotCreateDirectory;
+  }
+
+  return directoryCreatedSuccesfully;
+}
 
 function rmdir(directoryName) {
   if(!canRemoveDirectory(directoryName)) {
@@ -177,6 +204,26 @@ function rmdir(directoryName) {
   cwd.lastModified = Date.now();
 
   return true;
+}
+
+function rmdirParse(options) {
+  const numOfOptions = 1;
+  
+  if(!exactNumberOfOptions(options, numOfOptions)) {
+    return EXACT_NUMBER_OF_OPTIONS;
+  }
+  
+  let directoryName = options[0];
+  let result = rmdir(directoryName);
+
+  const couldNotRemoveDirectory = `Could not remove directory '${directoryName}'!`;
+  const directoryRemovedSuccesfully = `Directory '${directoryName}' successfully removed!`;
+
+  if(!result) {
+    return couldNotRemoveDirectory;
+  }
+
+  return directoryRemovedSuccesfully;
 }
 
 function touch(fileName) {
@@ -192,7 +239,26 @@ function touch(fileName) {
   cwd.lastModified = Date.now();
 
   return true;
-};
+}
+
+function touchParse(options) {
+  const numOfOptions = 1;
+
+  if(!exactNumberOfOptions(options, numOfOptions)) {
+    return EXACT_NUMBER_OF_OPTIONS;
+  }
+
+  let newFileName = options[0];
+  let result = touch(newFileName);
+  const couldNotCreateFile = `Could not create file '${newFileName}'!`;
+  const fileCreatedSuccesfully = `File '${newFileName}' created!`;
+
+  if(!result) {
+    return couldNotCreateFile;
+  }
+
+  return fileCreatedSuccesfully;
+}
 
 function rm(fileName) {
   if(!canRemoveFile(fileName)) {
@@ -206,31 +272,71 @@ function rm(fileName) {
   return true;
 }
 
+function rmParse(options) {
+  const numOfOptions = 1;
+
+  if(!exactNumberOfOptions(options, numOfOptions)) {
+    return EXACT_NUMBER_OF_OPTIONS;
+  }
+
+  let fileName = options[0];
+  let result = rm(fileName);
+
+  const couldNotRemoveFile = `Could not remove file '${fileName}'!`;
+  const fileRemovedSuccesfully = `File '${fileName}' removed succesfully!`;
+
+  if(!result) {
+    return couldNotRemoveFile;
+  }
+
+  return fileRemovedSuccesfully;
+}
+
 function cd(directoryName) {
   if(directoryName === ".." && isRootDirectory()) {
     console.log("Cannot 'cd' while in root!");
 
-    return false;
+    return [false, directoryName];
   }
 
   if(directoryName === ".." && cwd.parent !== null) {
     cwd = cwd.parent;
     console.log(`'cd' to ${cwd.name} successful!`);
 
-    return true;
+    return [true, cwd.name];
   }
 
   let tmpCwd = getDirectory(directoryName);
   
   if(tmpCwd === null) {
-    return false;
+    return [false, directoryName];
   }
 
   cwd = tmpCwd;
   console.log(`'cd' to ${cwd.name} successful!`);
 
-  return true;
-};
+  return [true, tmpCwd.name];
+}
+
+function cdParse(options) {
+  const numOfOptions = 1;
+  
+  if(!exactNumberOfOptions(options, numOfOptions)) {
+    return EXACT_NUMBER_OF_OPTIONS;
+  }
+
+  let newDirectoryArg = options[0];
+  let [result, newDirectoryName] = cd(newDirectoryArg);
+
+  const cdUnsuccessful = `Could not 'cd' to '${newDirectoryName}'!`;
+  const cdSuccessful = `'cd' to '${newDirectoryName}' successful!`;
+
+  if(!result) {
+    return cdUnsuccessful;
+  }
+
+  return cdSuccessful;
+}
 
 function write(fileName, content) {
   let file = getFile(fileName);
@@ -248,7 +354,46 @@ function write(fileName, content) {
   file.lastModified = Date.now();
 
   return true;
-};
+}
+
+function validQuotes(content) {
+  return (content[0] === "\"" && content[content.length - 1] === "\"") ||
+    (content[0] === "\'" && content[content.length - 1] === "\'");
+}
+
+function removeQuotes(content) {
+  return content.slice(1, content.length - 1);
+}
+
+function writeParse(options) {
+  const numOfOptions = 2;
+
+  if(!exactNumberOfOptions(options, numOfOptions)) {
+    return EXACT_NUMBER_OF_OPTIONS;
+  }
+
+  let fileName = options[0];
+  let content = options[1];
+
+  /*
+  if(!validQuotes(content)) {
+    return "String must be enclosed in quotes (\'\' or \"\")!";
+  }
+
+  content = removeQuotes(content);
+  */
+
+  let result = write(fileName, content);
+
+  const couldNotWriteToFile = `Could not write to file '${fileName}'!`;
+  const writeToFileSuccesfully = `Write to '${fileName}' successful!\nWritten ${content.length} characters.`;
+
+  if(!result) {
+    return couldNotWriteToFile;
+  }
+
+  return writeToFileSuccesfully;
+}
 
 function cat(fileName) {
   let file = getFile(fileName);
@@ -259,11 +404,13 @@ function cat(fileName) {
   }
 
   return file.content;
-};
+}
 
 function catParse(options) {
-  if(options.length > 1) {
-    return TOO_MANY_ARGUMENTS;
+  const numOfOptions = 1;
+
+  if(!exactNumberOfOptions(options, numOfOptions)) {
+    return EXACT_NUMBER_OF_OPTIONS;
   }
 
   let fileName = options[0];
@@ -325,11 +472,13 @@ function wc(fileName) {
     `lines: ${lines}`;
 
   return result;
-};
+}
 
 function wcParse(options) {
-  if(options.length > 1) {
-    return TOO_MANY_ARGUMENTS;
+  const numOfOptions = 1;
+  
+  if(!exactNumberOfOptions(options, numOfOptions)) {
+    return EXACT_NUMBER_OF_OPTIONS;
   }
 
   console.log(options);
@@ -380,11 +529,13 @@ function callTreeRecursive(directory, str, depth) {
   }
 
   return str;
-};
+}
 
 function treeParse(options) {
-  if(options.length > 0) {
-    return TOO_MANY_ARGUMENTS;
+  const numOfOptions = 0;
+
+  if(!exactNumberOfOptions(options, numOfOptions)) {
+    return EXACT_NUMBER_OF_OPTIONS;
   }
 
   let result = tree();
@@ -436,11 +587,13 @@ function callFindRecursive(target, directory, str) {
   }
   
   return str;
-};
+}
 
 function findParse(options) {
-  if(options.length > 1) {
-    return TOO_MANY_ARGUMENTS;
+  const numOfOptions = 1;
+
+  if(!exactNumberOfOptions(options, numOfOptions)) {
+    return EXACT_NUMBER_OF_OPTIONS;
   }
 
   let fileName = options[0];
@@ -450,50 +603,102 @@ function findParse(options) {
 }
 
 function isArgumentsStringEmpty(args) {
-  return args.trim().length > 0;
+  return args.trim().length === 0;
 }
 
 function isOptionsStringEmpty(options) {
-  return options.trim().length > 0;
+  return options.trim().length === 0;
 }
 
 function parseArguments(args) {
-  return args
-    .replace(/\s+/g, " ")
-    .trim()
-    .split(" ");
+  // + " " - so the last char will always be a 
+  // space (last whitespace is always trimmed) 
+  // with which I can then
+  // push the last token to the array  
+  let argsArray = args.trim() + " ";
+  let result = [];
+  let insideQuotes = false;
+  let token = "";
+  let lastChar = "";
+
+  for(let char of argsArray) {
+    if(char === "\"") {
+      insideQuotes = !insideQuotes;
+    }
+    
+    if(char === " "  && !insideQuotes) {
+      if(char !== lastChar) {
+        result.push(token);
+        token = "";
+      }
+    } else {
+      token += char;
+    }
+
+    lastChar = char;
+  }
+
+  return result;
+}
+
+function exactNumberOfOptions(options, numberOfArguments) {
+  return options.length === numberOfArguments;
 }
 
 function parse(args) {
   const cannotParseEmptyString = "Cannot parse an empty string!";
 
-  if(!isArgumentsStringEmpty(args)) {
+  if(isArgumentsStringEmpty(args)) {
     return cannotParseEmptyString;
   }
 
   let argumentsArray = parseArguments(args);
+  console.log(argumentsArray);
   let command = argumentsArray[0];
   let options = argumentsArray.slice(1);
   let result = EMPTY_STRING;
 
+  const invalidCommand = `Invalid command '${command}'.`;
+
   switch(command) {
-    case "pwd":
-      result = pwdParse(options);
+    case "mkdir":
+      result = mkdirParse(options);
+      break;
+    case "rmdir":
+      result = rmdirParse(options);
+      break;
+    case "touch":
+      result = touchParse(options);
+      break;
+    case "rm":
+      result = rmParse(options);
       break;
     case "ls":
       result = lsParse(options);
       break;
-    case "wc":
-      result = wcParse(options);
+    case "cd":
+      result = cdParse(options);
+      break;
+    case "pwd":
+      result = pwdParse(options);
+      break;
+    case "write":
+      result = writeParse(options);
       break;
     case "cat":
       result = catParse(options);
+      break;
+    case "wc":
+      result = wcParse(options);
       break;
     case "find":
       result = findParse(options);
       break;
     case "tree":
       result = treeParse(options);
+      break;
+    default:
+      result = invalidCommand;
       break;
   }
 
@@ -502,7 +707,7 @@ function parse(args) {
 
 function help(command) {
 
-};
+}
 
 touch("app1.js");
 touch("app2.js");
@@ -527,4 +732,11 @@ cd("..");
 cd("dir_1");
 console.log(tree());
 let findStr = find("file1.js");
-console.log(`${findStr}`)
+console.log(`${findStr}`);
+
+parseArguments("mkdir hello");
+parseArguments("mkdir bro");
+parseArguments("mkdir \"nrp nrš\"");
+parseArguments("mkdir   nrp      nrš");
+parseArguments("mkdir nr p  nrš");
+parseArguments("mkdir nrp nrš");
