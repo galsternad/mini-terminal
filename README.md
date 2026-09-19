@@ -6,10 +6,13 @@ Implementing a simple terminal-like interface in JS. Currently supports the foll
 - [x] ```touch```,
 - [x] ```rm```,
 - [x] ```ls```,
-- [ ] ```cd```,
+- [x] ```cd```,
 - [x] ```pwd```,
 - [x] ```write```,
 - [x] ```cat```,
 - [x] ```wc```,
 - [x] ```find```.
 - [x] ```tree```,
+- [ ] ```clear```.
+
+It comes with a simple, terminal-like UI.

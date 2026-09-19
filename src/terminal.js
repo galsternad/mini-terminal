@@ -375,18 +375,16 @@ function writeParse(options) {
   let fileName = options[0];
   let content = options[1];
 
-  /*
-  if(!validQuotes(content)) {
-    return "String must be enclosed in quotes (\'\' or \"\")!";
-  }
+  // if(!validQuotes(content)) {
+  //   return "String must be enclosed in quotes (\'\' or \"\")!";
+  // }
+  // 
+  // content = removeQuotes(content);
 
-  content = removeQuotes(content);
-  */
-
-  let result = write(fileName, content);
+  let result = write(fileName, cleanedContent);
 
   const couldNotWriteToFile = `Could not write to file '${fileName}'!`;
-  const writeToFileSuccesfully = `Write to '${fileName}' successful!\nWritten ${content.length} characters.`;
+  const writeToFileSuccesfully = `Write to '${fileName} successful!\nWritten ${content.length} characters.`;
 
   if(!result) {
     return couldNotWriteToFile;
@@ -491,7 +489,7 @@ function wcParse(options) {
 
 function tree() {
   let directory = cwd;
-  let directoryName = pwd() + "\n----------------\n";
+  let directoryName = "";
   const depth = 0;
 
   let result = callTreeRecursive(directory, directoryName, depth);
@@ -602,6 +600,23 @@ function findParse(options) {
   return result;
 }
 
+function clear() {
+  createNewCli();
+}
+
+function clearParse(options) {
+  const numOfOptions = 0;
+
+  if(!exactNumberOfOptions(options, numOfOptions)) {
+    return EXACT_NUMBER_OF_OPTIONS;
+  }
+
+  clear();
+
+  return "";
+}
+
+
 function isArgumentsStringEmpty(args) {
   return args.trim().length === 0;
 }
@@ -610,13 +625,18 @@ function isOptionsStringEmpty(options) {
   return options.trim().length === 0;
 }
 
+function removeQuotes(args) {
+
+}
+
 function parseArguments(args) {
-  // + " " - so the last char will always be a 
+  // args.trim() + " "
+  // so the last char will always be a 
   // space (last whitespace is always trimmed) 
   // with which I can then
   // push the last token to the array  
   let argsArray = args.trim() + " ";
-  let result = [];
+  let tokens = [];
   let insideQuotes = false;
   let token = "";
   let lastChar = "";
@@ -628,7 +648,7 @@ function parseArguments(args) {
     
     if(char === " "  && !insideQuotes) {
       if(char !== lastChar) {
-        result.push(token);
+        tokens.push(token);
         token = "";
       }
     } else {
@@ -638,7 +658,7 @@ function parseArguments(args) {
     lastChar = char;
   }
 
-  return result;
+  return tokens;
 }
 
 function exactNumberOfOptions(options, numberOfArguments) {
@@ -697,6 +717,9 @@ function parse(args) {
     case "tree":
       result = treeParse(options);
       break;
+    case "clear":
+      result = clearParse(options);
+      break;
     default:
       result = invalidCommand;
       break;
@@ -734,9 +757,76 @@ console.log(tree());
 let findStr = find("file1.js");
 console.log(`${findStr}`);
 
-parseArguments("mkdir hello");
-parseArguments("mkdir bro");
-parseArguments("mkdir \"nrp nrš\"");
-parseArguments("mkdir   nrp      nrš");
-parseArguments("mkdir nr p  nrš");
-parseArguments("mkdir nrp nrš");
+function createNewCliDiv() {
+  let div = document.createElement("div");
+  div.classList.add("cli-div");
+
+  return div;
+}
+
+function createNewCliLabel() {
+  let userCwdString = `user@${pwd()}:$ `;
+  let cliLabel = document.createElement("label");
+  cliLabel.classList.add("cli-label");
+  cliLabel.textContent = userCwdString;
+
+  return cliLabel;
+}
+
+function createNewCliInput() {
+  let cliInput = document.createElement("input");
+  cliInput.setAttribute("type", "text");
+  cliInput.setAttribute("name", "cli-input");
+  cliInput.setAttribute("autocomplete", "off");
+  cliInput.classList.add("cli-input");
+  setNewCliInput(cliInput);
+
+  return cliInput;
+}
+
+function createNewCliResult(str) {
+  let result = parse(str);
+
+  let cliResult = document.createElement("p");
+  cliResult.classList.add("cli-result");
+  cliResult.innerText = result;
+
+  return cliResult;
+}
+
+function createNewCli() {
+  let body = document.querySelector(".cli");
+  body.innerHTML = "";
+  
+  let cliDiv = createNewCliDiv();
+  let cliLabel = createNewCliLabel();
+  let cliInput = createNewCliInput();
+
+  cliDiv.appendChild(cliLabel);
+  cliDiv.appendChild(cliInput);
+
+  body.appendChild(cliDiv);
+}
+
+function setNewCliInput(input) {
+  input.addEventListener("keydown", (e) => {
+    if(e.key === "Enter") {
+      e.preventDefault();
+      input.readOnly = true;
+      
+      let newResult = createNewCliResult(input.value);
+      let newCliDiv = createNewCliDiv();
+      let newCliLabel = createNewCliLabel();
+      let newCliInput = createNewCliInput();
+    
+      newCliDiv.appendChild(newCliLabel);
+      newCliDiv.appendChild(newCliInput);
+      document.querySelector(".cli").appendChild(newResult);
+      document.querySelector(".cli").appendChild(newCliDiv);
+
+      newCliInput.focus();
+    }
+  });
+}
+
+createNewCli();
