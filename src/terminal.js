@@ -3,7 +3,6 @@
 const ROOT = new Directory("/");
 const EMPTY_STRING = "";
 const EXACT_NUMBER_OF_OPTIONS = "Command has to have an exact number of options!";
-const TOO_MANY_OPTIONS = "Too many options!";
 
 let cwd = ROOT;
 
@@ -345,24 +344,17 @@ function write(fileName, content) {
     return false;
   }
 
-  if(file.content.length === 0) {
-    file.content = content;
+  let fileContent = file.content;
+
+  if(fileContent.length === 0) {
+    fileContent = content;
   } else {
-    file.content += `\n${content}`
+    fileContent += `\n${content}`
   }
 
   file.lastModified = Date.now();
 
   return true;
-}
-
-function validQuotes(content) {
-  return (content[0] === "\"" && content[content.length - 1] === "\"") ||
-    (content[0] === "\'" && content[content.length - 1] === "\'");
-}
-
-function removeQuotes(content) {
-  return content.slice(1, content.length - 1);
 }
 
 function writeParse(options) {
@@ -375,16 +367,10 @@ function writeParse(options) {
   let fileName = options[0];
   let content = options[1];
 
-  // if(!validQuotes(content)) {
-  //   return "String must be enclosed in quotes (\'\' or \"\")!";
-  // }
-  // 
-  // content = removeQuotes(content);
-
-  let result = write(fileName, cleanedContent);
+  let result = write(fileName, content);
 
   const couldNotWriteToFile = `Could not write to file '${fileName}'!`;
-  const writeToFileSuccesfully = `Write to '${fileName} successful!\nWritten ${content.length} characters.`;
+  const writeToFileSuccesfully = `Write to '${fileName}' successful!\nWritten ${content.length} characters.`;
 
   if(!result) {
     return couldNotWriteToFile;
@@ -401,7 +387,9 @@ function cat(fileName) {
     return fileNotFound;
   }
 
-  return file.content;
+  let result  = file.content;
+  
+  return result;
 }
 
 function catParse(options) {
@@ -568,9 +556,9 @@ function buildFindString(child) {
   }
   
   return result
-  .reverse()
-  .join("/")
-  .slice(1) + "/" + child.name + "\n";
+    .reverse()
+    .join("/")
+    .slice(1) + "/" + child.name + "\n";
 }
 
 function callFindRecursive(target, directory, str) {
@@ -600,33 +588,8 @@ function findParse(options) {
   return result;
 }
 
-function clear() {
-  createNewCli();
-}
-
-function clearParse(options) {
-  const numOfOptions = 0;
-
-  if(!exactNumberOfOptions(options, numOfOptions)) {
-    return EXACT_NUMBER_OF_OPTIONS;
-  }
-
-  clear();
-
-  return "";
-}
-
-
 function isArgumentsStringEmpty(args) {
   return args.trim().length === 0;
-}
-
-function isOptionsStringEmpty(options) {
-  return options.trim().length === 0;
-}
-
-function removeQuotes(args) {
-
 }
 
 function parseArguments(args) {
@@ -636,17 +599,47 @@ function parseArguments(args) {
   // with which I can then
   // push the last token to the array  
   let argsArray = args.trim() + " ";
+  let isQuote = false;
+  let quoteUsed = "";
+  let isFlag = false;
   let tokens = [];
-  let insideQuotes = false;
+  let flags = new Set();
   let token = "";
   let lastChar = "";
 
   for(let char of argsArray) {
-    if(char === "\"") {
-      insideQuotes = !insideQuotes;
+    if(char === "\"" || char === "\'") {
+      isQuote = !isQuote;
+      quoteUsed = char;
+      continue;
+    }
+
+    if(char === "-" && !isQuote && token.length === 0) {
+      isFlag = !isFlag;
+      continue;
+    }
+
+    if(char !== " " && isFlag) {
+      token += char;
+      continue;
+    }
+
+    if(char === " " && isFlag) {
+      isFlag = !isFlag;
+      
+      for(let flag of token) {
+        if(!flags.has(flag)) {
+          flags.add(flag);
+          console.log(flag);
+        }
+      }
+
+      token = "";
+      lastChar = char;
+      continue;
     }
     
-    if(char === " "  && !insideQuotes) {
+    if(char === " "  && !isQuote && !isFlag) {
       if(char !== lastChar) {
         tokens.push(token);
         token = "";
@@ -658,7 +651,18 @@ function parseArguments(args) {
     lastChar = char;
   }
 
-  return tokens;
+  if(isQuote) {
+    // TODO:
+    // throw an error
+    console.log("token error");
+  }
+
+  let command = tokens[0];
+  let options = tokens.slice(1);
+
+  console.log([command, flags, options]);
+
+  return [command, flags, options];
 }
 
 function exactNumberOfOptions(options, numberOfArguments) {
@@ -674,8 +678,7 @@ function parse(args) {
 
   let argumentsArray = parseArguments(args);
   console.log(argumentsArray);
-  let command = argumentsArray[0];
-  let options = argumentsArray.slice(1);
+  let [command, flags, options] = parseArguments(args);
   let result = EMPTY_STRING;
 
   const invalidCommand = `Invalid command '${command}'.`;
@@ -717,9 +720,6 @@ function parse(args) {
     case "tree":
       result = treeParse(options);
       break;
-    case "clear":
-      result = clearParse(options);
-      break;
     default:
       result = invalidCommand;
       break;
@@ -729,6 +729,18 @@ function parse(args) {
 }
 
 function help(command) {
+
+}
+
+function save(options) {
+
+}
+
+function importJSON(options) {
+
+}
+
+function exportJSON(options) {
 
 }
 
@@ -753,15 +765,12 @@ touch("file2.js");
 cd("..");
 cd("..");
 cd("dir_1");
-console.log(tree());
-let findStr = find("file1.js");
-console.log(`${findStr}`);
 
 function createNewCliDiv() {
-  let div = document.createElement("div");
-  div.classList.add("cli-div");
+  let cliDiv = document.createElement("div");
+  cliDiv.classList.add("cli-div");
 
-  return div;
+  return cliDiv;
 }
 
 function createNewCliLabel() {
@@ -787,9 +796,9 @@ function createNewCliInput() {
 function createNewCliResult(str) {
   let result = parse(str);
 
-  let cliResult = document.createElement("p");
+  let cliResult = document.createElement("pre");
   cliResult.classList.add("cli-result");
-  cliResult.innerText = result;
+  cliResult.textContent = result;
 
   return cliResult;
 }
@@ -804,8 +813,27 @@ function createNewCli() {
 
   cliDiv.appendChild(cliLabel);
   cliDiv.appendChild(cliInput);
-
   body.appendChild(cliDiv);
+
+  cliInput.focus();
+}
+
+function addNewResult(input) {
+  let newResult = createNewCliResult(input);
+  let newCliDiv = createNewCliDiv();
+  let newCliLabel = createNewCliLabel();
+  let newCliInput = createNewCliInput();
+
+  newCliDiv.appendChild(newCliLabel);
+  newCliDiv.appendChild(newCliInput);
+  document.querySelector(".cli").appendChild(newResult);
+  document.querySelector(".cli").appendChild(newCliDiv);
+
+  newCliInput.focus();
+}
+
+function clearCli() {
+  createNewCli();
 }
 
 function setNewCliInput(input) {
@@ -813,18 +841,14 @@ function setNewCliInput(input) {
     if(e.key === "Enter") {
       e.preventDefault();
       input.readOnly = true;
-      
-      let newResult = createNewCliResult(input.value);
-      let newCliDiv = createNewCliDiv();
-      let newCliLabel = createNewCliLabel();
-      let newCliInput = createNewCliInput();
-    
-      newCliDiv.appendChild(newCliLabel);
-      newCliDiv.appendChild(newCliInput);
-      document.querySelector(".cli").appendChild(newResult);
-      document.querySelector(".cli").appendChild(newCliDiv);
 
-      newCliInput.focus();
+      let result = input.value.trim();
+
+      if(result !== "clear") {
+        addNewResult(result);
+      } else {
+        clearCli();
+      }
     }
   });
 }
