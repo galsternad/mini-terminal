@@ -41,9 +41,9 @@
 }
 
 .cli-label {
-  padding: 0;
-  margin: 0;
   color: green;
+  margin-right: 0.8rem;
+  display: inline;
 }
 
 .cli-result {
@@ -53,10 +53,14 @@
 
 .cli-input, input {
   outline: none;
-  margin-left: 10px;
   border: 0;
   flex: 1;
   min-width: 0;
   width: auto;
-  caret: block;
+  caret-shape: block;
+  caret-color: white;
+}
+
+.directory {
+  color: lightblue;
 }
