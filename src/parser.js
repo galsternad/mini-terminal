@@ -219,84 +219,96 @@ function isArgumentsStringEmpty(args) {
   return args.trim().length === 0;
 }
 
-function parseArguments(args) {
-  // args.trim() + " "
-  // so the last char will always be a 
-  // space (last whitespace is always trimmed) 
-  // with which I can then
-  // push the last token to the array  
-  let argsArray = args.trim() + " ";
+function tokenizer(args) {
+  let argumentsArray = args.trim();
+  let tokenStarted = false;
+  let token = "";
+  let tokens = [];
   let isQuote = false;
   let quoteUsed = "";
   let isFlag = false;
   let flags = new Set();
-  let tokenStarted = false;
-  let token = "";
-  let tokens = [];
-  let lastChar = "";
+  let isEscaped = false;
 
-  for(let char of argsArray) {
-    if((char === "\"" || char === "\'") && !isQuote) {
+  for(let char of argumentsArray) {
+    if(isEscaped && tokenStarted) {
+      token += char;
+      isEscaped = false;
+      continue;
+    }
+
+    if(char === "\\" && !isEscaped && tokenStarted) {
+      isEscaped = true;
+      continue;
+    }
+
+    if((char === "\"" || char === "\'") && !isQuote && !tokenStarted) {
+      tokenStarted = true;
       isQuote = true;
       quoteUsed = char;
       continue;
     }
 
-    if(isQuote && quoteUsed === char) {
+    if(char === quoteUsed && isQuote && tokenStarted) {
       isQuote = false;
       quoteUsed = "";
       continue;
     }
 
-    if(char === "-" && !isQuote && token.length === 0) {
-      isFlag = !isFlag;
+    // tokens.length === 1, because if length is 1,
+    // that means that the command was already parsed
+    // and we can only add flags between command and options
+    if(char === "-" && !isQuote && !tokenStarted && tokens.length === 1) {
+      isFlag = true;
       continue;
     }
 
-    if(char !== " " && isFlag && tokens.length === 1) {
-      token += char;
-      continue;
-    }
-
-    if(char === " " && isFlag && tokens.length === 1) {
-      isFlag = !isFlag;
-      
-      for(let flag of token) {
-        if(!flags.has(flag)) {
-          flags.add(flag);
-        }
+    if(isFlag) {
+      if(char !== " ") {
+        flags.add(char);
+      } else {
+        isFlag = false;
       }
 
-      token = "";
-      lastChar = char;
       continue;
     }
-    
-    if(char === " "  && !isQuote && !isFlag) {
-      if(char !== lastChar) {
+
+    if(char === " " && tokenStarted) {
+      if(!isQuote) {
         tokens.push(token);
+        tokenStarted = false;
         token = "";
+      } else {
+        token += char;
       }
-    } else {
-      token += char;
+
+      continue;
     }
 
-    lastChar = char;
+    if(char === " " && !tokenStarted) {
+      continue;
+    }
+
+    tokenStarted = true;
+    token += char;
+  }
+
+  if(tokenStarted && !isQuote) {
+    tokens.push(token);
+    tokenStarted = false;
+    token = "";
   }
 
   if(isQuote) {
-    // TODO:
-    // throw an error
-    console.log("token error");
+    console.log("throw quote error");
   }
 
   let command = tokens[0];
   let options = tokens.slice(1);
 
-  console.log([command, flags, options]);
-
   return [command, flags, options];
 }
+
 
 export function parse(args) {
   const cannotParseEmptyString = "Cannot parse an empty string!";
@@ -305,7 +317,7 @@ export function parse(args) {
     return cannotParseEmptyString;
   }
 
-  let [command, flags, options] = parseArguments(args);
+  let [command, flags, options] = tokenizer(args);
   let result = "";
 
   argumentHistory.push(args);
