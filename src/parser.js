@@ -14,7 +14,7 @@ import { cd } from "./commands/cd.js";
 import { tree } from "./commands/tree.js";
 import { find } from "./commands/find.js";
 import { commands } from "./commands.js";
-import { createResultObject, getHelpString } from "./helpers.js";
+import { createResultObject, createHelpString } from "./helpers.js";
 
 const EXACT_NUMBER_OF_OPTIONS = "Command has to have an exact number of options!";
 export let argumentHistory = new ArgumentHistory();
@@ -23,28 +23,28 @@ function exactNumberOfOptions(options, numberOfArguments) {
   return options.length === numberOfArguments;
 }
 
-function mkdirParse(options) {
-  const numOfOptions = 1;
+function mkdirParse(options, flags) {
+  let result = {};
   
-  if(!exactNumberOfOptions(options, numOfOptions)) {
-    return EXACT_NUMBER_OF_OPTIONS;
-  }
-  
-  let newDirectoryName = options[0];
-  let result = mkdir(newDirectoryName);
+  if(flags.has("h")) {
+    let helpString = createHelpString(commands["mkdir"]);
 
-  const couldNotCreateDirectory = `Could not create directory '${newDirectoryName}'!`;
-  const directoryCreatedSuccesfully = `Directory '${newDirectoryName}' created!`;
+    result = createResultObject("mkdir", "text", helpString);
 
-  if(!result) {  
-    return couldNotCreateDirectory;
-  }
+    return result;
+  } 
+
+  let directoryName = options[0];
+  let code = mkdir(directoryName);
+
+  const directoryCreatedSuccesfully = `Directory '${directoryName}' created!`;
 
   return {
     command: "mkdir",
     type: "text",
-    value: directoryCreatedSuccesfully
-  };
+    data: directoryCreatedSuccesfully,
+    code: code,
+  }
 }
 
 function rmdirParse(options) {
@@ -125,7 +125,7 @@ function lsParse(options, flags) {
   let result = {};
 
   if(flags.has("h")) {
-    let helpString = getHelpString(commands["ls"]);
+    let helpString = createHelpString(commands["ls"]);
 
     result = createResultObject("ls", "text", helpString);
 
@@ -153,7 +153,7 @@ function catParse(options, flags) {
   let result = {};
 
   if(flags.has("h")) {
-    let helpString = getHelpString(commands["cat"]);
+    let helpString = createHelpString(commands["cat"]);
 
     result = createResultObject("cat", "text", helpString);
 
@@ -215,7 +215,7 @@ function cdParse(options, flags) {
   let result = {};
 
   if(flags.has("h")) {
-    let helpString = getHelpString(commands["cd"]);
+    let helpString = createHelpString(commands["cd"]);
 
     result = createResultObject("cd", "text", helpString);
 
@@ -390,49 +390,53 @@ export function parse(args) {
 
   const invalidCommand = `Invalid command '${command}'.`;
 
-  switch(command) {
-    case "mkdir":
-      result = mkdirParse(options, flags);
-      break;
-    case "rmdir":
-      result = rmdirParse(options, flags);
-      break;
-    case "touch":
-      result = touchParse(options, flags);
-      break;
-    case "rm":
-      result = rmParse(options, flags);
-      break;
-    case "ls":
-      result = lsParse(options, flags);
-      break;
-    case "cd":
-      result = cdParse(options, flags);
-      break;
-    case "pwd":
-      result = pwdParse(options, flags);
-      break;
-    case "write":
-      result = writeParse(options, flags);
-      break;
-    case "cat":
-      result = catParse(options, flags);
-      break;
-    case "wc":
-      result = wcParse(options, flags);
-      break;
-    case "find":
-      result = findParse(options, flags);
-      break;
-    case "tree":
-      result = treeParse(options, flags);
-      break;
-    default:
-      result = invalidCommand;
-      break;
+  try {
+    switch(command) {
+      case "mkdir":
+        result = mkdirParse(options, flags);
+        break;
+      case "rmdir":
+        result = rmdirParse(options, flags);
+        break;
+      case "touch":
+        result = touchParse(options, flags);
+        break;
+      case "rm":
+        result = rmParse(options, flags);
+        break;
+      case "ls":
+        result = lsParse(options, flags);
+        break;
+      case "cd":
+        result = cdParse(options, flags);
+        break;
+      case "pwd":
+        result = pwdParse(options, flags);
+        break;
+      case "write":
+        result = writeParse(options, flags);
+        break;
+      case "cat":
+        result = catParse(options, flags);
+        break;
+      case "wc":
+        result = wcParse(options, flags);
+        break;
+      case "find":
+        result = findParse(options, flags);
+        break;
+      case "tree":
+        result = treeParse(options, flags);
+        break;
+      default:
+        result = invalidCommand;
+        break;
+    }
+  } catch(err) {
+    console.log(err.message + ", " + err.code);
+    
+    return err;
   }
-
-  console.log(result);
 
   return result;
 }
