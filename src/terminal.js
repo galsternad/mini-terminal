@@ -49,7 +49,7 @@ function createNewCliInput() {
 
 function createNewCliResult(str) {
   let result = parse(str);
-  console.log(result.data);
+  console.log(result);
 
   let cliResult = document.createElement("pre");
   cliResult.classList.add("cli-result");

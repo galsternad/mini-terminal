@@ -1,30 +1,41 @@
 "use strict";
 
+import { DIRECTORY_NOT_FOUND, DirectorySystemError, PROCESS_ERROR, PROCESS_EXECUTED_SUCCESSFULLY } from "../constructors/Error.js";
 import { cwd, setCwd } from "../fileState.js";
-import { isRootDirectory, getDirectory } from "../helpers.js";
+import { isRootDirectory, getDirectory, checkIfDirectoryExists } from "../helpers.js";
 
 export function cd(directoryName) {
-  if(directoryName === ".." && isRootDirectory()) {
-    console.log("Cannot 'cd' while in root!");
+  const invalidNameString = `Invalid name: '${directoryName}'.`;
+  const directoryNotFoundString = `Directory '${directoryName}' does not exist.`;
 
-    return [false, directoryName];
+  if(isNameUndefinedOrEmpty(directoryName)) {
+    throw new DirectorySystemError(
+      invalidNameString,
+      DIRECTORY_INVALID_NAME
+    );
+  }
+  
+  if(directoryName === ".." && isRootDirectory()) {
+    throw new DirectorySystemError(
+      "",
+      PROCESS_ERROR
+    );
   }
 
   if(directoryName === ".." && cwd.parent !== null) {
-    setCwd(cwd.parent);
-    console.log(`'cd' to ${cwd.name} successful!`);
+    return PROCESS_EXECUTED_SUCCESSFULLY;
+  }
 
-    return [true, cwd.name];
+  if(!checkIfDirectoryExists(directoryName)) {
+    throw new DirectorySystemError(
+      directoryNotFoundString,
+      DIRECTORY_NOT_FOUND
+    );
   }
 
   let tmpCwd = getDirectory(directoryName);
-  
-  if(tmpCwd === null) {
-    return [false, directoryName];
-  }
 
   setCwd(tmpCwd);
-  console.log(`'cd' to ${cwd.name} successful!`);
 
-  return [true, tmpCwd.name];
+  return PROCESS_EXECUTED_SUCCESSFULLY;
 }

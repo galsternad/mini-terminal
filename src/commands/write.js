@@ -1,13 +1,27 @@
 "use strict";
 
-import { getFile } from "../helpers.js";
+import { FILE_MODIFIED_SUCCESSFULLY, FILE_NOT_FOUND, FileSystemError } from "../constructors/Error.js";
+import { checkIfFileExists, isNameUndefinedOrEmpty, getFile } from "../helpers.js";
 
 export function write(fileName, content) {
-  let file = getFile(fileName);
+  const invalidNameString = `Invalid name: '${fileName}'.`;
+  const fileNotFoundString = `File '${fileName}' does not exist.`;
 
-  if(file === null) {
-    return false;
+  if(isNameUndefinedOrEmpty(fileName)) {
+    throw new FileSystemError(
+      invalidNameString,
+      FILE_INVALID_NAME
+    );
   }
+
+  if(!checkIfFileExists(fileName)) {
+    throw new FileSystemError(
+      fileNotFoundString,
+      FILE_NOT_FOUND
+    );
+  }
+
+  let file = getFile(fileName);
 
   if(file.content.length === 0) {
     file.content = content;
@@ -17,5 +31,5 @@ export function write(fileName, content) {
 
   file.lastModified = Date.now();
 
-  return true;
+  return FILE_MODIFIED_SUCCESSFULLY;
 }

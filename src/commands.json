@@ -32,59 +32,57 @@
     }
   },
   "mkdir": {
-    "description": "",
-    "usage": "",
+    "description": "Creates a new directory.",
+    "usage": "mkdir [OPTIONS] <directory>",
     "flags": {
-
+      "h": "-h: Print help."
     }
   },
   "pwd": {
     "description": "",
     "usage": "",
-    "flags": {
-
-    }
+    "flags": { }
   },
   "rm": {
     "description": "",
     "usage": "",
     "flags": {
-
+      "h": "-h: Print help."
     }
   },
   "rmdir": {
     "description": "",
     "usage": "",
     "flags": {
-
+      "h": "-h: Print help."
     }
   },
   "touch": {
     "description": "",
     "usage": "",
     "flags": {
-
+      "h": "-h: Print help."
     }
   },
   "tree": {
     "description": "",
     "usage": "",
     "flags": {
-
+      "h": "-h: Print help."
     }
   },
   "wc": {
     "description": "",
     "usage": "",
     "flags": {
-
+      "h": "-h: Print help."
     }
   },
   "write": {
     "description": "",
     "usage": "",
     "flags": {
-
+      "h": "-h: Print help."
     }
   }
 }

@@ -49,6 +49,7 @@
 .cli-result {
   padding: 0;
   margin: 0;
+  text-wrap: wrap;
 }
 
 .cli-input, input {

@@ -2,26 +2,34 @@
 
 import { cwd } from "../fileState.js";
 import { Directory } from "../constructors/Directory.js";
-import { checkIfDirectoryOrFileExists } from "../helpers.js";
+import { checkIfDirectoryOrFileExists, isNameUndefinedOrEmpty } from "../helpers.js";
 import { 
   DirectorySystemError,
   DIRECTORY_ALREADY_EXISTS, 
-  DIRECTORY_CREATED_SUCCESSFULLY
+  DIRECTORY_CREATED_SUCCESSFULLY,
+  DIRECTORY_INVALID_NAME
 } from "../constructors/Error.js";
 
 export function mkdir(directoryName) {
-  // TODO:
-  // throw an error
+  const invalidNameString = `Invalid name: '${directoryName}'.`;
+  const directoryOrFileAlreadyExistsString = `Directory or file '${directoryName}' already exists.`; 
+
+  if(isNameUndefinedOrEmpty(directoryName)) {
+    throw new DirectorySystemError(
+      invalidNameString,
+      DIRECTORY_INVALID_NAME
+    )
+  }
+
   if(checkIfDirectoryOrFileExists(directoryName)) {
     throw new DirectorySystemError(
-      "Directory already exists!",
+      directoryOrFileAlreadyExistsString,
       DIRECTORY_ALREADY_EXISTS
-    )
+    );
   }
 
   let newDirectory = new Directory(directoryName, cwd);
   cwd.children.set(directoryName, newDirectory);
-  // console.log(`Directory '${directoryName}' created!`);
   cwd.lastModified = Date.now();
 
   return DIRECTORY_CREATED_SUCCESSFULLY;

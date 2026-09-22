@@ -1,13 +1,18 @@
 "use strict";
 
 import { getFile } from "../helpers.js";
+import { FILE_NOT_FOUND, FileSystemError } from "../constructors/Error.js";
 
 export function cat(fileName, flags) {
   let file = getFile(fileName);
-  const fileNotFound = `File '${fileName}' not found!`;
   
   if(file === null) {
-    return fileNotFound;
+    const fileNotFound = `File '${fileName}' not found!`;
+    
+    throw new FileSystemError(
+      fileNotFound,
+      FILE_NOT_FOUND
+    );
   }
 
   let result = file.content;

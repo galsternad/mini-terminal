@@ -14,7 +14,8 @@ import { cd } from "./commands/cd.js";
 import { tree } from "./commands/tree.js";
 import { find } from "./commands/find.js";
 import { commands } from "./commands.js";
-import { createResultObject, createHelpString } from "./helpers.js";
+import { createResultObject, checkValidFlags, createHelpObject } from "./helpers.js";
+import { FlagError, FLAGS_PARSED_SUCCESSFULLY, PROCESS_EXECUTED_SUCCESSFULLY } from "./constructors/Error.js";
 
 const EXACT_NUMBER_OF_OPTIONS = "Command has to have an exact number of options!";
 export let argumentHistory = new ArgumentHistory();
@@ -25,122 +26,106 @@ function exactNumberOfOptions(options, numberOfArguments) {
 
 function mkdirParse(options, flags) {
   let result = {};
+
+  checkValidFlags("mkdir", flags);
   
   if(flags.has("h")) {
-    let helpString = createHelpString(commands["mkdir"]);
-
-    result = createResultObject("mkdir", "text", helpString);
+    result = createHelpObject("mkdir");
 
     return result;
   } 
 
   let directoryName = options[0];
   let code = mkdir(directoryName);
-
   const directoryCreatedSuccesfully = `Directory '${directoryName}' created!`;
 
-  return {
-    command: "mkdir",
-    type: "text",
-    data: directoryCreatedSuccesfully,
-    code: code,
-  }
+  result = createResultObject("mkdir", "text", directoryCreatedSuccesfully, code);
+
+  return result;
 }
 
-function rmdirParse(options) {
-  const numOfOptions = 1;
-  
-  if(!exactNumberOfOptions(options, numOfOptions)) {
-    return EXACT_NUMBER_OF_OPTIONS;
-  }
-  
-  let directoryName = options[0];
-  let result = rmdir(directoryName);
+function rmdirParse(options, flags) {
+  let result = {};
 
-  const couldNotRemoveDirectory = `Could not remove directory '${directoryName}'!`;
+  checkValidFlags("rmdir", flags);
+
+  if(flags.has("h")) {
+    result = createHelpObject("rmdir");
+
+    return result;
+  }
+
+  let directoryName = options[0];
+  let code  = rmdir(directoryName);
   const directoryRemovedSuccesfully = `Directory '${directoryName}' successfully removed!`;
 
-  if(!result) {
-    return couldNotRemoveDirectory;
-  }
+  result = createResultObject("rmdir", "text", directoryRemovedSuccesfully, code);
 
-  return {
-    command: "rmdir",
-    type: "text",
-    value: directoryRemovedSuccesfully
-  };
+  return result;
 }
 
-function touchParse(options) {
-  const numOfOptions = 1;
+function touchParse(options, flags) {
+  let result = {};
 
-  if(!exactNumberOfOptions(options, numOfOptions)) {
-    return EXACT_NUMBER_OF_OPTIONS;
-  }
+  checkValidFlags("touch", flags);
 
-  let newFileName = options[0];
-  let result = touch(newFileName);
-  const couldNotCreateFile = `Could not create file '${newFileName}'!`;
-  const fileCreatedSuccesfully = `File '${newFileName}' created!`;
+  if(flags.has("h")) {
+    result = createHelpObject("touch");
 
-  if(!result) {
-    return couldNotCreateFile;
-  }
-
-  return {
-    command: "touch",
-    type: "text",
-    value: fileCreatedSuccesfully
-  };
-}
-
-function rmParse(options) {
-  const numOfOptions = 1;
-
-  if(!exactNumberOfOptions(options, numOfOptions)) {
-    return EXACT_NUMBER_OF_OPTIONS;
+    return result;
   }
 
   let fileName = options[0];
-  let result = rm(fileName);
+  let code = touch(fileName);
+  const fileCreatedSuccesfully = `File '${fileName}' created!`;
 
-  const couldNotRemoveFile = `Could not remove file '${fileName}'!`;
+  result = createResultObject("touch", "text", fileCreatedSuccesfully, code);
+
+  return result;
+}
+
+function rmParse(options, flags) {
+  let result = {};
+
+  checkValidFlags("rm", flags);
+  
+  if(flags.has("h")) {
+    result = createHelpObject("rm");
+
+    return result;
+  }
+  
+  let fileName = options[0];
+  let code = rm(fileName);
   const fileRemovedSuccesfully = `File '${fileName}' removed succesfully!`;
 
-  if(!result) {
-    return {
-      command: "rm",
-      value: couldNotRemoveFile
-    };
-  }
+  result = createResultObject("rm", "text", fileRemovedSuccesfully, code);
 
-  return {
-    command: "rm",
-    type: "text",
-    value: fileRemovedSuccesfully
-  };
+  return result;
 }
 
 function lsParse(options, flags) {
   let result = {};
 
-  if(flags.has("h")) {
-    let helpString = createHelpString(commands["ls"]);
+  checkValidFlags("ls", flags);
 
-    result = createResultObject("ls", "text", helpString);
+  if(flags.has("h")) {
+    result = createHelpObject("ls");
 
     return result;
   }
 
   let data = ls();
 
-  result = createResultObject("ls", "entries", data);
+  result = createResultObject("ls", "entries", data, PROCESS_EXECUTED_SUCCESSFULLY);
 
   return result;
 }
 
-function pwdParse(options) {
+function pwdParse(options, flags) {
   let result = {};
+
+  checkValidFlags("pwd", flags);
   
   let data = pwd();
 
@@ -152,91 +137,76 @@ function pwdParse(options) {
 function catParse(options, flags) {
   let result = {};
 
-  if(flags.has("h")) {
-    let helpString = createHelpString(commands["cat"]);
+  checkValidFlags("cat", flags);
 
-    result = createResultObject("cat", "text", helpString);
+  if(flags.has("h")) {
+    result = createHelpObject("cat");
 
     return result;
   }
 
   let fileName = options[0];
   let data = cat(fileName, flags);
-  
-  result = createResultObject("cat", "text", data);
+
+  result = createResultObject("cat", "text", data, PROCESS_EXECUTED_SUCCESSFULLY);
 
   return result;
 }
 
-function wcParse(options) {
-  const numOfOptions = 1;
-  
-  if(!exactNumberOfOptions(options, numOfOptions)) {
-    return EXACT_NUMBER_OF_OPTIONS;
+function wcParse(options, flags) {
+  let result = {};
+
+  checkValidFlags("wc", flags);
+
+  if(flags.has("h")) {
+    result = createHelpObject("wc");
+
+    return result;
   }
   
   let fileName = options[0];
-  let result = wc(fileName);
+  let data = wc(fileName);
   
-  return {
-    command: "wc",
-    type: "text",
-    value: result
-  };
+  result = createResultObject("wc", "text", data, PROCESS_EXECUTED_SUCCESSFULLY);
 }
 
-function writeParse(options) {
-  const numOfOptions = 2;
+function writeParse(options, flags) {
+  let result = {};
 
-  if(!exactNumberOfOptions(options, numOfOptions)) {
-    return EXACT_NUMBER_OF_OPTIONS;
+  checkValidFlags("write", flags);
+
+  if(flags.has("h")) {
+    result = createHelpObject("write");
+
+    return result;
   }
 
   let fileName = options[0];
   let content = options[1];
-
-  let result = write(fileName, content);
-
-  const couldNotWriteToFile = `Could not write to file '${fileName}'!`;
+  let code = write(fileName, content);
   const writeToFileSuccesfully = `Write to '${fileName}' successful!\nWritten ${content.length} characters.`;
 
-  if(!result) {
-    return couldNotWriteToFile;
-  }
-
-  return {
-    command: "write",
-    type: "text",
-    value: writeToFileSuccesfully
-  };
+  result = createResultObject("write", "text", writeToFileSuccesfully, code);
+  
+  return result;
 }
 
 function cdParse(options, flags) {
   let result = {};
 
-  if(flags.has("h")) {
-    let helpString = createHelpString(commands["cd"]);
+  checkValidFlags(options, flags);
 
-    result = createResultObject("cd", "text", helpString);
+  if(flags.has("h")) {
+    result = createResultObject("cd");
 
     return result;
   }
 
-  let newDirectoryArg = options[0];
-  let newDirectoryName = cd(newDirectoryArg);
+  let directoryName = options[0];
+  let code = cd(directoryName);
+  const cdSuccessful = `'cd' to '${directoryName}' successful!`;
 
-  const cdUnsuccessful = `Could not 'cd' to '${newDirectoryName}'!`;
-  const cdSuccessful = `'cd' to '${newDirectoryName}' successful!`;
-
-  if(!result) {
-    return "err";
-  }
-
-  return {
-    command: "cd",
-    type: "text",
-    value: cdSuccessful
-  };
+  result = createResultObject("cd", "text", cdSuccessful, code);
 }
 
 function treeParse(options) {
