@@ -1,19 +1,10 @@
 "use strict";
 
 import { getFile } from "../helpers.js";
-import { commands, getHelpString } from "../commands.js";
-
-let catCommand = commands["cat"]
 
 export function cat(fileName, flags) {
   let file = getFile(fileName);
   const fileNotFound = `File '${fileName}' not found!`;
-
-  if(flags.has("h")) {
-    let helpString = getHelpString(catCommand);
-
-    return helpString;
-  }
   
   if(file === null) {
     return fileNotFound;

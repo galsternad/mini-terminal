@@ -67,3 +67,22 @@ export function canRemoveFile(fileName) {
 
   return true;
 }
+
+export function getHelpString(command) {
+  let helpString = "";
+  helpString += `${command["description"]}\n${command["usage"]}\n\nOptions:\n`;
+
+  for(let flag of Object.values(command["flags"])) {
+    helpString += `${flag}\n`;
+  }
+
+  return helpString;
+}
+
+export function createResultObject(command, type, data) {
+  return {
+    command: command,
+    type: type,
+    data: data
+  };
+}

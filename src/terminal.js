@@ -3,22 +3,6 @@
 import { parse, argumentHistory } from "./parser.js";
 import { pwd } from "./commands/pwd.js";
 
-const COMMANDS = [
-  "mkdir",
-  "rmdir",
-  "touch",
-  "rm",
-  "ls",
-  "cd",
-  "pwd",
-  "write",
-  "cat",
-  "wc",
-  "find",
-  "tree",
-  "clear"
-]
-
 function help(command) {
 
 }
@@ -65,10 +49,11 @@ function createNewCliInput() {
 
 function createNewCliResult(str) {
   let result = parse(str);
+  console.log(result.data);
 
   let cliResult = document.createElement("pre");
   cliResult.classList.add("cli-result");
-  cliResult.textContent = result;
+  cliResult.textContent = result.data;
 
   return cliResult;
 }

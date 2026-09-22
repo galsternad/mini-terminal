@@ -13,6 +13,8 @@ import { write } from "./commands/write.js";
 import { cd } from "./commands/cd.js";
 import { tree } from "./commands/tree.js";
 import { find } from "./commands/find.js";
+import { commands } from "./commands.js";
+import { createResultObject, getHelpString } from "./helpers.js";
 
 const EXACT_NUMBER_OF_OPTIONS = "Command has to have an exact number of options!";
 export let argumentHistory = new ArgumentHistory();
@@ -38,7 +40,11 @@ function mkdirParse(options) {
     return couldNotCreateDirectory;
   }
 
-  return directoryCreatedSuccesfully;
+  return {
+    command: "mkdir",
+    type: "text",
+    value: directoryCreatedSuccesfully
+  };
 }
 
 function rmdirParse(options) {
@@ -58,7 +64,11 @@ function rmdirParse(options) {
     return couldNotRemoveDirectory;
   }
 
-  return directoryRemovedSuccesfully;
+  return {
+    command: "rmdir",
+    type: "text",
+    value: directoryRemovedSuccesfully
+  };
 }
 
 function touchParse(options) {
@@ -77,7 +87,11 @@ function touchParse(options) {
     return couldNotCreateFile;
   }
 
-  return fileCreatedSuccesfully;
+  return {
+    command: "touch",
+    type: "text",
+    value: fileCreatedSuccesfully
+  };
 }
 
 function rmParse(options) {
@@ -94,44 +108,63 @@ function rmParse(options) {
   const fileRemovedSuccesfully = `File '${fileName}' removed succesfully!`;
 
   if(!result) {
-    return couldNotRemoveFile;
+    return {
+      command: "rm",
+      value: couldNotRemoveFile
+    };
   }
 
-  return fileRemovedSuccesfully;
+  return {
+    command: "rm",
+    type: "text",
+    value: fileRemovedSuccesfully
+  };
 }
 
-function lsParse(options) {
-  const numOfOptions = 0;
-  
-  if(!exactNumberOfOptions(options, numOfOptions)) {
-    return "";
+function lsParse(options, flags) {
+  let result = {};
+
+  if(flags.has("h")) {
+    let helpString = getHelpString(commands["ls"]);
+
+    result = createResultObject("ls", "text", helpString);
+
+    return result;
   }
-  
-  return ls();
+
+  let data = ls();
+
+  result = createResultObject("ls", "entries", data);
+
+  return result;
 }
 
 function pwdParse(options) {
-  const numOfOptions = 0;
+  let result = {};
   
-  if(!exactNumberOfOptions(options, numOfOptions)) {
-    return EXACT_NUMBER_OF_OPTIONS;
-  }
-  
-  let result = pwd();
-  
+  let data = pwd();
+
+  result = createResultObject("pwd", "text", data);
+
   return result;
 }
 
 function catParse(options, flags) {
-  const numOfOptions = 1;
-  
-  // if(!exactNumberOfOptions(options, numOfOptions)) {
-  //   return EXACT_NUMBER_OF_OPTIONS;
-  // }
-  
+  let result = {};
+
+  if(flags.has("h")) {
+    let helpString = getHelpString(commands["cat"]);
+
+    result = createResultObject("cat", "text", helpString);
+
+    return result;
+  }
+
   let fileName = options[0];
-  let result = cat(fileName, flags);
+  let data = cat(fileName, flags);
   
+  result = createResultObject("cat", "text", data);
+
   return result;
 }
 
@@ -145,7 +178,11 @@ function wcParse(options) {
   let fileName = options[0];
   let result = wc(fileName);
   
-  return result;
+  return {
+    command: "wc",
+    type: "text",
+    value: result
+  };
 }
 
 function writeParse(options) {
@@ -167,27 +204,39 @@ function writeParse(options) {
     return couldNotWriteToFile;
   }
 
-  return writeToFileSuccesfully;
+  return {
+    command: "write",
+    type: "text",
+    value: writeToFileSuccesfully
+  };
 }
 
-function cdParse(options) {
-  const numOfOptions = 1;
-  
-  if(!exactNumberOfOptions(options, numOfOptions)) {
-    return EXACT_NUMBER_OF_OPTIONS;
+function cdParse(options, flags) {
+  let result = {};
+
+  if(flags.has("h")) {
+    let helpString = getHelpString(commands["cd"]);
+
+    result = createResultObject("cd", "text", helpString);
+
+    return result;
   }
 
   let newDirectoryArg = options[0];
-  let [result, newDirectoryName] = cd(newDirectoryArg);
+  let newDirectoryName = cd(newDirectoryArg);
 
   const cdUnsuccessful = `Could not 'cd' to '${newDirectoryName}'!`;
   const cdSuccessful = `'cd' to '${newDirectoryName}' successful!`;
 
   if(!result) {
-    return cdUnsuccessful;
+    return "err";
   }
 
-  return cdSuccessful;
+  return {
+    command: "cd",
+    type: "text",
+    value: cdSuccessful
+  };
 }
 
 function treeParse(options) {
@@ -199,7 +248,11 @@ function treeParse(options) {
 
   let result = tree();
 
-  return result;
+  return {
+    command: "tree",
+    type: "entries",
+    value: result
+  };
 }
 
 function findParse(options) {
@@ -212,7 +265,11 @@ function findParse(options) {
   let fileName = options[0];
   let result = find(fileName);
 
-  return result;
+  return {
+    command: "find",
+    type: "entries",
+    value: result
+  };
 }
 
 function isArgumentsStringEmpty(args) {
@@ -326,7 +383,7 @@ export function parse(args) {
   }
 
   let { command, flags, options } = tokenizer(args);
-  let result = "";
+  let result = {};
 
   argumentHistory.push(args);
   argumentHistory.index = argumentHistory.length;
@@ -335,45 +392,47 @@ export function parse(args) {
 
   switch(command) {
     case "mkdir":
-      result = mkdirParse(options);
+      result = mkdirParse(options, flags);
       break;
     case "rmdir":
-      result = rmdirParse(options);
+      result = rmdirParse(options, flags);
       break;
     case "touch":
-      result = touchParse(options);
+      result = touchParse(options, flags);
       break;
     case "rm":
-      result = rmParse(options);
+      result = rmParse(options, flags);
       break;
     case "ls":
-      result = lsParse(options);
+      result = lsParse(options, flags);
       break;
     case "cd":
-      result = cdParse(options);
+      result = cdParse(options, flags);
       break;
     case "pwd":
-      result = pwdParse(options);
+      result = pwdParse(options, flags);
       break;
     case "write":
-      result = writeParse(options);
+      result = writeParse(options, flags);
       break;
     case "cat":
       result = catParse(options, flags);
       break;
     case "wc":
-      result = wcParse(options);
+      result = wcParse(options, flags);
       break;
     case "find":
-      result = findParse(options);
+      result = findParse(options, flags);
       break;
     case "tree":
-      result = treeParse(options);
+      result = treeParse(options, flags);
       break;
     default:
       result = invalidCommand;
       break;
   }
+
+  console.log(result);
 
   return result;
 }
@@ -428,3 +487,4 @@ cd("..");
 cd("..");
 cd("..");
 write("file1.js", "hello\n\n\n     \n    hello");
+console.clear();

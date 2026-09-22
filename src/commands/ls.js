@@ -1,20 +1,24 @@
 "use strict";
+
+import { commands } from "../commands.js";
 import { cwd } from "../fileState.js";
 
+let lsCommand = commands["ls"];
+
+// TODO:
+// implement flags
 export function ls() {
   let result = [];
-
+  
   for(let child of cwd.children.values()) {
     let name = child.name;
+    let type = child.type;
 
-    if(child.type === "directory") {
-      name += "/";
-    }
-
-    result.push(name);
+    result.push({
+      name: name,
+      type: type
+    });
   }
 
-  return result
-    .sort()
-    .join("\n")
+  return result;
 }

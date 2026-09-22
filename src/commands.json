@@ -3,76 +3,88 @@
     "description": "Prints the file content to the terminal.",
     "usage": "cat [OPTIONS] <file>",
     "flags": {
-        "n": "-n: Numbers all of the lines (including empty lines).",
-        "b": "-b: Numbers only non-empty lines.",
-        "s": "-s: Removes all empty lines.",
-        "h": "-h: Print help."
+      "n": "-n: Numbers all of the lines (including empty lines).",
+      "b": "-b: Numbers only non-empty lines.",
+      "s": "-s: Removes all empty lines.",
+      "h": "-h: Print help."
     }
   },
   "cd": {
-    "description": "",
-    "usage": "",
-    "flags": [
-    ]
+    "description": "Changes the current working directory.",
+    "usage": "cd [OPTIONS] <directory>",
+    "flags": {
+
+    }
   },
   "find": {
     "description": "",
     "usage": "",
-    "flags": [
-    ]
+    "flags": {
+
+    }
   },
   "ls": {
-    "description": "",
-    "usage": "",
-    "flags": [
-    ]
+    "description": "Displays the content of a directory.",
+    "usage": "ls [OPTIONS] [DIRECTORY]",
+    "flags": {
+      "l": "-l: Print long.",
+      "h": "-h: Print help."
+    }
   },
   "mkdir": {
     "description": "",
     "usage": "",
-    "flags": [
-    ]
+    "flags": {
+
+    }
   },
   "pwd": {
     "description": "",
     "usage": "",
-    "flags": [
-    ]
+    "flags": {
+
+    }
   },
   "rm": {
     "description": "",
     "usage": "",
-    "flags": [
-    ]
+    "flags": {
+
+    }
   },
   "rmdir": {
     "description": "",
     "usage": "",
-    "flags": [
-    ]
+    "flags": {
+
+    }
   },
   "touch": {
     "description": "",
     "usage": "",
-    "flags": [
-    ]
+    "flags": {
+
+    }
   },
   "tree": {
     "description": "",
     "usage": "",
-    "flags": [
-    ]
+    "flags": {
+
+    }
   },
   "wc": {
     "description": "",
     "usage": "",
-    "flags": [
-    ]
+    "flags": {
+
+    }
   },
   "write": {
     "description": "",
     "usage": "",
-    "flags": [
-    ]
+    "flags": {
+
+    }
   }
 }
