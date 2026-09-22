@@ -122,15 +122,15 @@ function pwdParse(options) {
   return result;
 }
 
-function catParse(options) {
+function catParse(options, flags) {
   const numOfOptions = 1;
   
-  if(!exactNumberOfOptions(options, numOfOptions)) {
-    return EXACT_NUMBER_OF_OPTIONS;
-  }
+  // if(!exactNumberOfOptions(options, numOfOptions)) {
+  //   return EXACT_NUMBER_OF_OPTIONS;
+  // }
   
   let fileName = options[0];
-  let result = cat(fileName);
+  let result = cat(fileName, flags);
   
   return result;
 }
@@ -232,7 +232,15 @@ function tokenizer(args) {
 
   for(let char of argumentsArray) {
     if(isEscaped && tokenStarted) {
-      token += char;
+      switch(char){
+        case "n":
+          token += "\n";
+          break;
+        default:
+          token += char;
+          break;
+      }
+
       isEscaped = false;
       continue;
     }
@@ -306,7 +314,7 @@ function tokenizer(args) {
   let command = tokens[0];
   let options = tokens.slice(1);
 
-  return [command, flags, options];
+  return { command, flags, options };
 }
 
 
@@ -317,7 +325,7 @@ export function parse(args) {
     return cannotParseEmptyString;
   }
 
-  let [command, flags, options] = tokenizer(args);
+  let { command, flags, options } = tokenizer(args);
   let result = "";
 
   argumentHistory.push(args);
@@ -351,7 +359,7 @@ export function parse(args) {
       result = writeParse(options);
       break;
     case "cat":
-      result = catParse(options);
+      result = catParse(options, flags);
       break;
     case "wc":
       result = wcParse(options);
@@ -419,3 +427,4 @@ cd("..");
 cd("..");
 cd("..");
 cd("..");
+write("file1.js", "hello\n\n\n     \n    hello");

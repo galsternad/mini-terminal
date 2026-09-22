@@ -1,0 +1,78 @@
+{
+  "cat": {
+    "description": "Prints the file content to the terminal.",
+    "usage": "cat [OPTIONS] <file>",
+    "flags": {
+        "n": "-n: Numbers all of the lines (including empty lines).",
+        "b": "-b: Numbers only non-empty lines.",
+        "s": "-s: Removes all empty lines.",
+        "h": "-h: Print help."
+    }
+  },
+  "cd": {
+    "description": "",
+    "usage": "",
+    "flags": [
+    ]
+  },
+  "find": {
+    "description": "",
+    "usage": "",
+    "flags": [
+    ]
+  },
+  "ls": {
+    "description": "",
+    "usage": "",
+    "flags": [
+    ]
+  },
+  "mkdir": {
+    "description": "",
+    "usage": "",
+    "flags": [
+    ]
+  },
+  "pwd": {
+    "description": "",
+    "usage": "",
+    "flags": [
+    ]
+  },
+  "rm": {
+    "description": "",
+    "usage": "",
+    "flags": [
+    ]
+  },
+  "rmdir": {
+    "description": "",
+    "usage": "",
+    "flags": [
+    ]
+  },
+  "touch": {
+    "description": "",
+    "usage": "",
+    "flags": [
+    ]
+  },
+  "tree": {
+    "description": "",
+    "usage": "",
+    "flags": [
+    ]
+  },
+  "wc": {
+    "description": "",
+    "usage": "",
+    "flags": [
+    ]
+  },
+  "write": {
+    "description": "",
+    "usage": "",
+    "flags": [
+    ]
+  }
+}
