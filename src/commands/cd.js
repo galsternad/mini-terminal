@@ -1,8 +1,14 @@
 "use strict";
 
-import { DIRECTORY_NOT_FOUND, DirectorySystemError, PROCESS_ERROR, PROCESS_EXECUTED_SUCCESSFULLY } from "../constructors/Error.js";
+import {
+  DIRECTORY_NOT_FOUND,
+  DirectorySystemError,
+  PROCESS_ERROR,
+  PROCESS_EXECUTED_SUCCESSFULLY,
+  DIRECTORY_INVALID_NAME
+} from "../constructors/Error.js";
 import { cwd, setCwd } from "../fileState.js";
-import { isRootDirectory, getDirectory, checkIfDirectoryExists } from "../helpers.js";
+import { isRootDirectory, getDirectory, checkIfDirectoryExists, isNameUndefinedOrEmpty } from "../helpers.js";
 
 export function cd(directoryName) {
   const invalidNameString = `Invalid name: '${directoryName}'.`;
@@ -23,6 +29,8 @@ export function cd(directoryName) {
   }
 
   if(directoryName === ".." && cwd.parent !== null) {
+    setCwd(cwd.parent);
+    
     return PROCESS_EXECUTED_SUCCESSFULLY;
   }
 

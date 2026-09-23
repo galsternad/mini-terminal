@@ -3,45 +3,38 @@
 import { cwd } from "../fileState.js";
 
 function buildTreeString(child, depth) {
-  let result = "";
-  const indent = 2;
+  let result = {};
 
-  // indent
-  for(let i = 0; i < depth * indent; i++) {
-    result += " ";
-  }
-
-  result += child.name;
-
-  if(child.type === "directory") {
-    result += "/";
-  }
-
-  result += "\n";
+  result = {
+    name: child.name,
+    type: child.type,
+    depth: depth
+  };
 
   return result;
 }
 
-function callTreeRecursive(directory, str, depth) {
+function callTreeRecursive(directory, result, depth) {
   for(let child of directory.children.values()) {
-    str += buildTreeString(child, depth);
+    result.push(buildTreeString(child, depth));
     
     if(child.type === "directory") {
-      str = callTreeRecursive(child, str, depth + 1);
+      result = callTreeRecursive(child, result, depth + 1);
     }
   }
 
-  return str;
+  return result;
 }
 
 // TODO:
 // sort by alphabet
-export function tree() {
+export function tree(options, flags) {
+  let result = [];
+  
   let directory = cwd;
-  let directoryName = "";
   const depth = 0;
 
-  let result = callTreeRecursive(directory, directoryName, depth);
+  result = callTreeRecursive(directory, result, depth);
 
-  return result.slice(0, result.length - 1);
+  return result;
 }

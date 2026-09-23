@@ -16,11 +16,13 @@ function buildFindString(child) {
     currentWorkingDirectory = currentWorkingDirectory.parent;
     result.push(currentWorkingDirectory.name);
   }
+
   
-  return result
-    .reverse()
-    .join("/")
-    .slice(1) + "/" + child.name + "\n";
+  result = result.reverse();
+  result.push(child.name);
+  console.log(result);
+
+  return result;
 }
 
 function callFindRecursive(target, directory, str) {

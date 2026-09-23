@@ -13,9 +13,8 @@ import { write } from "./commands/write.js";
 import { cd } from "./commands/cd.js";
 import { tree } from "./commands/tree.js";
 import { find } from "./commands/find.js";
-import { commands } from "./commands.js";
 import { createResultObject, checkValidFlags, createHelpObject } from "./helpers.js";
-import { FlagError, FLAGS_PARSED_SUCCESSFULLY, PROCESS_EXECUTED_SUCCESSFULLY } from "./constructors/Error.js";
+import { PROCESS_EXECUTED_SUCCESSFULLY } from "./constructors/Error.js";
 
 const EXACT_NUMBER_OF_OPTIONS = "Command has to have an exact number of options!";
 export let argumentHistory = new ArgumentHistory();
@@ -104,7 +103,7 @@ function rmParse(options, flags) {
   return result;
 }
 
-function lsParse(options, flags) {
+function lsParse(flags) {
   let result = {};
 
   checkValidFlags("ls", flags);
@@ -122,14 +121,14 @@ function lsParse(options, flags) {
   return result;
 }
 
-function pwdParse(options, flags) {
+function pwdParse(flags) {
   let result = {};
 
   checkValidFlags("pwd", flags);
   
   let data = pwd();
 
-  result = createResultObject("pwd", "text", data);
+  result = createResultObject("pwd", "text", data, PROCESS_EXECUTED_SUCCESSFULLY);
 
   return result;
 }
@@ -194,10 +193,10 @@ function writeParse(options, flags) {
 function cdParse(options, flags) {
   let result = {};
 
-  checkValidFlags(options, flags);
+  checkValidFlags("cd", flags);
 
   if(flags.has("h")) {
-    result = createResultObject("cd");
+    result = createHelpObject("cd");
 
     return result;
   }
@@ -209,37 +208,41 @@ function cdParse(options, flags) {
   result = createResultObject("cd", "text", cdSuccessful, code);
 }
 
-function treeParse(options) {
-  const numOfOptions = 0;
+function treeParse(flags) {
+  let result = {};
 
-  if(!exactNumberOfOptions(options, numOfOptions)) {
-    return EXACT_NUMBER_OF_OPTIONS;
+  checkValidFlags("tree", flags);
+
+  if(flags.has("h")) {
+    result = createHelpObject("tree");
+
+    return result;
   }
 
-  let result = tree();
+  let data = tree();
 
-  return {
-    command: "tree",
-    type: "entries",
-    value: result
-  };
+  result = createResultObject("tree", "entries", data, PROCESS_EXECUTED_SUCCESSFULLY);
+
+  return result;
 }
 
-function findParse(options) {
-  const numOfOptions = 1;
+function findParse(options, flags) {
+  let result = {};
 
-  if(!exactNumberOfOptions(options, numOfOptions)) {
-    return EXACT_NUMBER_OF_OPTIONS;
+  checkValidFlags("find", flags);
+
+  if(flags.has("h")) {
+    result = createHelpObject("find");
+
+    return result;
   }
 
   let fileName = options[0];
-  let result = find(fileName);
+  let data = find(fileName);
 
-  return {
-    command: "find",
-    type: "entries",
-    value: result
-  };
+  result = createResultObject("find", "entries", data, PROCESS_EXECUTED_SUCCESSFULLY);
+
+  return result;
 }
 
 function isArgumentsStringEmpty(args) {
@@ -375,13 +378,13 @@ export function parse(args) {
         result = rmParse(options, flags);
         break;
       case "ls":
-        result = lsParse(options, flags);
+        result = lsParse(flags);
         break;
       case "cd":
         result = cdParse(options, flags);
         break;
       case "pwd":
-        result = pwdParse(options, flags);
+        result = pwdParse(flags);
         break;
       case "write":
         result = writeParse(options, flags);
@@ -396,7 +399,7 @@ export function parse(args) {
         result = findParse(options, flags);
         break;
       case "tree":
-        result = treeParse(options, flags);
+        result = treeParse(flags);
         break;
       default:
         result = invalidCommand;
@@ -451,14 +454,6 @@ touch("tree.js");
 touch("wc.js");
 touch("write.js");
 cd("..");
-cd("constructors");
-touch("ArgumentHistory.js");
-touch("Directory.js");
-touch("File.js");
 cd("..");
 cd("..");
 cd("..");
-cd("..");
-cd("..");
-write("file1.js", "hello\n\n\n     \n    hello");
-console.clear();
