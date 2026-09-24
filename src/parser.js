@@ -14,8 +14,17 @@ import { cd } from "./commands/cd.js";
 import { tree } from "./commands/tree.js";
 import { find } from "./commands/find.js";
 import { date } from "./commands/date.js";
-import { createResultObject, checkValidFlags, createHelpObject } from "./helpers.js";
-import { PROCESS_EXECUTED_SUCCESSFULLY } from "./processCodes.js";
+import { TokenizerError } from "./constructors/Error.js";
+import { 
+  createResultObject,
+  checkValidFlags,
+  createHelpObject
+} from "./helpers.js";
+import {
+  PROCESS_EXECUTED_SUCCESSFULLY,
+  INVALID_TOKEN
+} from "./processCodes.js";
+import { resolvePath } from "./pathResolver.js";
 
 const EXACT_NUMBER_OF_OPTIONS = "Command has to have an exact number of options!";
 export let argumentHistory = new ArgumentHistory();
@@ -104,7 +113,7 @@ function rmParse(options, flags) {
   return result;
 }
 
-function lsParse(flags) {
+function lsParse(options, flags) {
   let result = {};
 
   checkValidFlags("ls", flags);
@@ -115,7 +124,8 @@ function lsParse(flags) {
     return result;
   }
 
-  let data = ls();
+  let path = options[0];
+  let data = ls(path, flags);
 
   result = createResultObject("ls", "entries", data, PROCESS_EXECUTED_SUCCESSFULLY);
 
@@ -359,7 +369,7 @@ function tokenizer(args) {
   if(isQuote) {
     throw new TokenizerError(
       `Argument should be enclosed in quotes.`,
-      
+      INVALID_TOKEN
     )
   }
 
@@ -377,6 +387,7 @@ export function parse(args) {
   }
 
   let { command, flags, options } = tokenizer(args);
+
   let result = {};
 
   argumentHistory.push(args);
@@ -399,7 +410,7 @@ export function parse(args) {
         result = rmParse(options, flags);
         break;
       case "ls":
-        result = lsParse(flags);
+        result = lsParse(options, flags);
         break;
       case "cd":
         result = cdParse(options, flags);
@@ -430,14 +441,20 @@ export function parse(args) {
         break;
     }
   } catch(err) {
-    console.log(err.message + ", " + err.code);
-    
-    return err;
+    return {
+      command: command,
+      type: "error",
+      entries: {
+        message: err.message,
+        code: err.code
+      }
+    };
   }
 
   return result;
 }
 
+/*
 touch("file1.js");
 touch("file2.js");
 touch("my-file.txt");
@@ -481,4 +498,6 @@ cd("..");
 cd("..");
 cd("..");
 cd("..");
+*/
+
 console.clear();

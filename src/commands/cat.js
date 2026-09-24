@@ -4,7 +4,7 @@ import { getFile } from "../helpers.js";
 import { FileSystemError } from "../constructors/Error.js";
 import { FILE_NOT_FOUND } from "../processCodes.js";
 
-export function cat(fileName, flags) {
+export function cat(path, flags) {
   let file = getFile(fileName);
   
   if(file === null) {

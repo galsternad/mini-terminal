@@ -8,40 +8,26 @@ import {
   DIRECTORY_INVALID_NAME
 } from "../processCodes.js";
 import { cwd, setCwd } from "../fileState.js";
-import { isRootDirectory, getDirectory, checkIfDirectoryExists, isNameUndefinedOrEmpty } from "../helpers.js";
+import {
+  isRootDirectory,
+  getDirectory,
+  checkIfDirectoryExists,
+  isNameUndefinedOrEmpty
+} from "../helpers.js";
+import { resolvePath } from "../pathResolver.js";
 
-export function cd(directoryName) {
-  const invalidNameString = `Invalid name: '${directoryName}'.`;
-  const directoryNotFoundString = `Directory '${directoryName}' does not exist.`;
+export function cd(path) {
+  const invalidNameString = `Invalid name: '${path}'.`;
+  const directoryNotFoundString = `Directory '${path}' does not exist.`;
 
-  if(isNameUndefinedOrEmpty(directoryName)) {
+  if(isNameUndefinedOrEmpty(path)) {
     throw new DirectorySystemError(
       invalidNameString,
       DIRECTORY_INVALID_NAME
     );
   }
-  
-  if(directoryName === ".." && isRootDirectory()) {
-    throw new DirectorySystemError(
-      "",
-      PROCESS_ERROR
-    );
-  }
 
-  if(directoryName === ".." && cwd.parent !== null) {
-    setCwd(cwd.parent);
-    
-    return PROCESS_EXECUTED_SUCCESSFULLY;
-  }
-
-  if(!checkIfDirectoryExists(directoryName)) {
-    throw new DirectorySystemError(
-      directoryNotFoundString,
-      DIRECTORY_NOT_FOUND
-    );
-  }
-
-  let tmpCwd = getDirectory(directoryName);
+  let tmpCwd = resolvePath(path);
 
   setCwd(tmpCwd);
 

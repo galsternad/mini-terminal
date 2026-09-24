@@ -9,6 +9,7 @@ export const DIRECTORY_INVALID_NAME = 203;
 export const DIRECTORY_NOT_FOUND = 204;
 export const DIRECTORY_ALREADY_EXISTS = 205;
 export const DIRECTORY_NOT_EMPTY = 206;
+export const NOT_A_DIRECTORY = 207;
 
 export const FILE_CREATED_SUCCESSFULLY = 300;
 export const FILE_REMOVED_SUCCESSFULLY = 301;
@@ -16,6 +17,8 @@ export const FILE_MODIFIED_SUCCESSFULLY = 302;
 export const FILE_INVALID_NAME = 303;
 export const FILE_NOT_FOUND = 304;
 export const FILE_ALREADY_EXISTS = 305;
+
+export const INVALID_TOKEN = 603;
 
 export const FLAGS_PARSED_SUCCESSFULLY = 700;
 export const FLAG_NOT_FOUND = 704;
