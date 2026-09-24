@@ -1,11 +1,11 @@
 "use strict";
 
+import { FileSystemError } from "../constructors/Error.js";
 import { 
   FILE_REMOVED_SUCCESSFULLY,
   FILE_INVALID_NAME,
   FILE_NOT_FOUND,
-  FileSystemError
-} from "../constructors/Error.js";
+} from "../processCodes.js";
 import { cwd } from "../fileState.js";
 import {
   checkIfFileExists,

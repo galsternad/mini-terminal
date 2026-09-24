@@ -3,7 +3,8 @@
 import { cwd } from "../fileState.js";
 import { File } from "../constructors/File.js";
 import { checkIfDirectoryOrFileExists, isNameUndefinedOrEmpty } from "../helpers.js";
-import { FILE_ALREADY_EXISTS, FILE_CREATED_SUCCESSFULLY, FileSystemError } from "../constructors/Error.js";
+import { FILE_ALREADY_EXISTS, FILE_CREATED_SUCCESSFULLY } from "../processCodes.js";
+import { FileSystemError } from "../constructors/Error.js";
 
 export function touch(fileName) {
   const invalidNameString = `Invalid name: '${fileName}'.`;

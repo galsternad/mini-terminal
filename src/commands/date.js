@@ -1,12 +1,11 @@
 "use strict";
 
-export function date(options, flags) {
+export function date() {
   let result = "";
 
   let currentTime = Date.now();
   
   result = new Date(currentTime);
-  console.log(result);
 
   return result.toString();
 }

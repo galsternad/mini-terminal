@@ -15,7 +15,7 @@ import { tree } from "./commands/tree.js";
 import { find } from "./commands/find.js";
 import { date } from "./commands/date.js";
 import { createResultObject, checkValidFlags, createHelpObject } from "./helpers.js";
-import { PROCESS_EXECUTED_SUCCESSFULLY } from "./constructors/Error.js";
+import { PROCESS_EXECUTED_SUCCESSFULLY } from "./processCodes.js";
 
 const EXACT_NUMBER_OF_OPTIONS = "Command has to have an exact number of options!";
 export let argumentHistory = new ArgumentHistory();
@@ -257,9 +257,11 @@ function dateParse(options, flags) {
     return result;
   }
 
-  let data = date(options, flags);
+  let data = date();
 
   result = createResultObject("date", "text", data, PROCESS_EXECUTED_SUCCESSFULLY);
+
+  return result;
 }
 
 function isArgumentsStringEmpty(args) {
@@ -355,7 +357,10 @@ function tokenizer(args) {
   }
 
   if(isQuote) {
-    console.log("throw quote error");
+    throw new TokenizerError(
+      `Argument should be enclosed in quotes.`,
+      
+    )
   }
 
   let command = tokens[0];
@@ -476,3 +481,4 @@ cd("..");
 cd("..");
 cd("..");
 cd("..");
+console.clear();

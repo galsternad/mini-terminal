@@ -1,7 +1,8 @@
 "use strict";
 
 import { getFile } from "../helpers.js";
-import { FILE_NOT_FOUND, FileSystemError } from "../constructors/Error.js";
+import { FileSystemError } from "../constructors/Error.js";
+import { FILE_NOT_FOUND } from "../processCodes.js";
 
 export function cat(fileName, flags) {
   let file = getFile(fileName);

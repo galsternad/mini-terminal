@@ -2,7 +2,8 @@
 
 import { cwd, ROOT } from "./fileState.js";
 import { commands } from "./commands.js";
-import { FlagError, FLAG_NOT_FOUND, FLAGS_PARSED_SUCCESSFULLY } from "./constructors/Error.js";
+import { FlagError } from "./constructors/Error.js";
+import { FLAG_NOT_FOUND, FLAGS_PARSED_SUCCESSFULLY } from "../processCodes.js";
 
 export function isRootDirectory() {
   return cwd === ROOT;

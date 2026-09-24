@@ -1,6 +1,7 @@
 "use strict";
 
-import { FILE_MODIFIED_SUCCESSFULLY, FILE_NOT_FOUND, FileSystemError } from "../constructors/Error.js";
+import { FileSystemError } from "../constructors/Error.js";
+import { FILE_MODIFIED_SUCCESSFULLY, FILE_NOT_FOUND } from "../processCodes.js";
 import { checkIfFileExists, isNameUndefinedOrEmpty, getFile } from "../helpers.js";
 
 export function write(fileName, content) {

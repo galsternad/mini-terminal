@@ -1,12 +1,12 @@
 "use strict";
 
+import { DirectorySystemError } from "../constructors/Error.js";
 import {
   DIRECTORY_NOT_FOUND,
-  DirectorySystemError,
   PROCESS_ERROR,
   PROCESS_EXECUTED_SUCCESSFULLY,
   DIRECTORY_INVALID_NAME
-} from "../constructors/Error.js";
+} from "../processCodes.js";
 import { cwd, setCwd } from "../fileState.js";
 import { isRootDirectory, getDirectory, checkIfDirectoryExists, isNameUndefinedOrEmpty } from "../helpers.js";
 

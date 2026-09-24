@@ -3,12 +3,12 @@
 import { cwd } from "../fileState.js";
 import { Directory } from "../constructors/Directory.js";
 import { checkIfDirectoryOrFileExists, isNameUndefinedOrEmpty } from "../helpers.js";
-import { 
-  DirectorySystemError,
+import { DirectorySystemError } from "../constructors/Error.js";
+import {
   DIRECTORY_ALREADY_EXISTS, 
   DIRECTORY_CREATED_SUCCESSFULLY,
   DIRECTORY_INVALID_NAME
-} from "../constructors/Error.js";
+} from "../processCodes.js"
 
 export function mkdir(directoryName) {
   const invalidNameString = `Invalid name: '${directoryName}'.`;
