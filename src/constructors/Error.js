@@ -49,3 +49,13 @@ export function FlagError(message, code) {
 
 FlagError.prototype = Object.create(Error.prototype);
 FlagError.prototype.constructor = FlagError;
+
+export function TokenizerError(message, code) {
+  Error.call(this, message);
+
+  this.message = message;
+  this.code = code;
+}
+
+TokenizerError.prototype = Object.create(Error.prototype);
+TokenizerError.prototype.constructor = TokenizerError;

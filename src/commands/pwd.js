@@ -7,6 +7,7 @@ export function pwd() {
     return "/";
   }
   
+
   let currentWorkingDirectory = cwd;
   let currentWorkingDirectoryArr = [];
   currentWorkingDirectoryArr.push(cwd.name);

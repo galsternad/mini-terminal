@@ -13,6 +13,7 @@ import { write } from "./commands/write.js";
 import { cd } from "./commands/cd.js";
 import { tree } from "./commands/tree.js";
 import { find } from "./commands/find.js";
+import { date } from "./commands/date.js";
 import { createResultObject, checkValidFlags, createHelpObject } from "./helpers.js";
 import { PROCESS_EXECUTED_SUCCESSFULLY } from "./constructors/Error.js";
 
@@ -245,6 +246,22 @@ function findParse(options, flags) {
   return result;
 }
 
+function dateParse(options, flags) {
+  let result = {};
+
+  checkValidFlags("date", flags);
+
+  if(flags.has("h")) {
+    result = createHelpObject("date");
+
+    return result;
+  }
+
+  let data = date(options, flags);
+
+  result = createResultObject("date", "text", data, PROCESS_EXECUTED_SUCCESSFULLY);
+}
+
 function isArgumentsStringEmpty(args) {
   return args.trim().length === 0;
 }
@@ -347,7 +364,6 @@ function tokenizer(args) {
   return { command, flags, options };
 }
 
-
 export function parse(args) {
   const cannotParseEmptyString = "Cannot parse an empty string!";
 
@@ -400,6 +416,9 @@ export function parse(args) {
         break;
       case "tree":
         result = treeParse(flags);
+        break;
+      case "date":
+        result = dateParse(options, flags);
         break;
       default:
         result = invalidCommand;
