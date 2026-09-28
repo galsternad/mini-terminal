@@ -46,6 +46,12 @@ export function getFile(fileName, tmpCwd) {
 }
 
 export function splitPathAndName(path) {
+  // TODO:
+  // better solution
+  if(path === undefined) {
+    return { name: "", pathTo: "" };
+  }
+
   let splitPath = path.split("/");
   let name = splitPath.pop();
   let pathTo = splitPath.join("/");

@@ -11,37 +11,40 @@ export function resolvePath(path) {
   let pathArray = path.split("/");
   let tmp = cwd;
 
+  const directoryNotFoundString = `Directory '${path}' does not exist.`;
+  
   for(let pathElement of pathArray) {
     // it's the same directory
     if(pathElement === "." || pathElement === "") {
       continue;
     }
-
+    
     if(pathElement === "..") {
-      if(tmp.parent !== null) {
-        tmp = tmp.parent;
-
-        continue;
-      } else {
+      if(tmp.parent === null) {        
         throw new DirectorySystemError(
-          "Not found, parent is null.",
+          directoryNotFoundString,
           DIRECTORY_NOT_FOUND
-        )
+        );
+        
       }
+      tmp = tmp.parent;
+      continue;
     }
-
+    
     if(!tmp.children.has(pathElement)) {
       throw new DirectorySystemError(
-        "Not found",
+        directoryNotFoundString,
         DIRECTORY_NOT_FOUND
       )
     }
-
+    
     tmp = tmp.children.get(pathElement);
 
+    const isNotADirectoryString = `'${tmp.name}' is not a directory.`;
+    
     if(tmp.type !== "directory") {
       throw new DirectorySystemError(
-        "Not a directory",
+        isNotADirectoryString,
         NOT_A_DIRECTORY
       );
     }

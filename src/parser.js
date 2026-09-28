@@ -454,7 +454,6 @@ export function parse(args) {
   return result;
 }
 
-/*
 touch("file1.js");
 touch("file2.js");
 touch("my-file.txt");
@@ -498,6 +497,5 @@ cd("..");
 cd("..");
 cd("..");
 cd("..");
-*/
 
 console.clear();

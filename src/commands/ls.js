@@ -3,8 +3,7 @@
 import { commands } from "../commands.js";
 import { cwd } from "../fileState.js";
 import { resolvePath } from "../pathResolver.js";
-import { DirectorySystemError } from "../constructors/Error.js";
-import { DIRECTORY_INVALID_NAME } from "../processCodes.js";
+import { isNameUndefinedOrEmpty } from "../helpers.js";
  
 let lsCommand = commands["ls"];
 
@@ -13,7 +12,7 @@ let lsCommand = commands["ls"];
 export function ls(path, flags) {
   let tmpCwd = cwd;
 
-  if(path !== undefined) {
+  if(!isNameUndefinedOrEmpty(path)) {
     tmpCwd = resolvePath(path);
   }
   

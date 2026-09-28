@@ -1,6 +1,5 @@
 "use strict";
 
-import { cwd } from "../fileState.js";
 import { Directory } from "../constructors/Directory.js";
 import {
   checkIfDirectoryOrFileExists,
@@ -25,7 +24,7 @@ export function mkdir(path) {
     throw new DirectorySystemError(
       invalidNameString,
       DIRECTORY_INVALID_NAME
-    )
+    );
   }
 
   let tmpCwd = resolvePath(pathTo);
