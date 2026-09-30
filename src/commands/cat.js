@@ -1,20 +1,34 @@
 "use strict";
 
-import { getFile } from "../helpers.js";
-import { FILE_NOT_FOUND, FileSystemError } from "../constructors/Error.js";
+import { getFile, splitPathAndName, isNameUndefinedOrEmpty, checkIfFileExists } from "../helpers.js";
+import { FileSystemError } from "../constructors/Error.js";
+import { FILE_NOT_FOUND, FILE_INVALID_NAME } from "../processCodes.js";
+import { resolvePath } from "../pathResolver.js";
 
-export function cat(fileName, flags) {
-  let file = getFile(fileName);
+export function cat(path, flags) {
+  let { name: fileName, pathTo } = splitPathAndName(path);
   
-  if(file === null) {
-    const fileNotFound = `File '${fileName}' not found!`;
-    
+  const invalidNameString = `Invalid name: '${fileName}'.`;
+  
+  if(isNameUndefinedOrEmpty(fileName)) {
     throw new FileSystemError(
-      fileNotFound,
+      invalidNameString,
+      FILE_INVALID_NAME
+    );
+  }
+
+  let tmpCwd = resolvePath(pathTo);
+  
+  const fileNotFoundString = `File '${fileName}' not found.`;  
+
+  if(!checkIfFileExists(fileName, tmpCwd)) {
+    throw new FileSystemError(
+      fileNotFoundString,
       FILE_NOT_FOUND
     );
   }
 
+  let file = getFile(fileName, tmpCwd);
   let result = file.content;
 
   if(flags.has("s")) {

@@ -14,8 +14,8 @@ function buildTreeString(child, depth) {
   return result;
 }
 
-function callTreeRecursive(directory, result, depth) {
-  for(let child of directory.children.values()) {
+function callTreeRecursive(currentDirectory, result, depth) {
+  for(let child of currentDirectory.children.values()) {
     result.push(buildTreeString(child, depth));
     
     if(child.type === "directory") {
@@ -31,10 +31,10 @@ function callTreeRecursive(directory, result, depth) {
 export function tree(options, flags) {
   let result = [];
   
-  let directory = cwd;
+  let currentDirectory = cwd;
   const depth = 0;
 
-  result = callTreeRecursive(directory, result, depth);
+  result = callTreeRecursive(currentDirectory, result, depth);
 
   return result;
 }

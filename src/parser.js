@@ -13,8 +13,18 @@ import { write } from "./commands/write.js";
 import { cd } from "./commands/cd.js";
 import { tree } from "./commands/tree.js";
 import { find } from "./commands/find.js";
-import { createResultObject, checkValidFlags, createHelpObject } from "./helpers.js";
-import { PROCESS_EXECUTED_SUCCESSFULLY } from "./constructors/Error.js";
+import { date } from "./commands/date.js";
+import { TokenizerError } from "./constructors/Error.js";
+import { 
+  createResultObject,
+  checkValidFlags,
+  createHelpObject
+} from "./helpers.js";
+import {
+  PROCESS_EXECUTED_SUCCESSFULLY,
+  INVALID_TOKEN
+} from "./processCodes.js";
+import { resolvePath } from "./pathResolver.js";
 
 const EXACT_NUMBER_OF_OPTIONS = "Command has to have an exact number of options!";
 export let argumentHistory = new ArgumentHistory();
@@ -103,7 +113,7 @@ function rmParse(options, flags) {
   return result;
 }
 
-function lsParse(flags) {
+function lsParse(options, flags) {
   let result = {};
 
   checkValidFlags("ls", flags);
@@ -114,7 +124,8 @@ function lsParse(flags) {
     return result;
   }
 
-  let data = ls();
+  let path = options[0];
+  let data = ls(path, flags);
 
   result = createResultObject("ls", "entries", data, PROCESS_EXECUTED_SUCCESSFULLY);
 
@@ -144,8 +155,8 @@ function catParse(options, flags) {
     return result;
   }
 
-  let fileName = options[0];
-  let data = cat(fileName, flags);
+  let path = options[0];
+  let data = cat(path, flags);
 
   result = createResultObject("cat", "text", data, PROCESS_EXECUTED_SUCCESSFULLY);
 
@@ -163,10 +174,12 @@ function wcParse(options, flags) {
     return result;
   }
   
-  let fileName = options[0];
-  let data = wc(fileName);
+  let path = options[0];
+  let data = wc(path, flags);
   
   result = createResultObject("wc", "text", data, PROCESS_EXECUTED_SUCCESSFULLY);
+
+  return result;
 }
 
 function writeParse(options, flags) {
@@ -241,6 +254,24 @@ function findParse(options, flags) {
   let data = find(fileName);
 
   result = createResultObject("find", "entries", data, PROCESS_EXECUTED_SUCCESSFULLY);
+
+  return result;
+}
+
+function dateParse(options, flags) {
+  let result = {};
+
+  checkValidFlags("date", flags);
+
+  if(flags.has("h")) {
+    result = createHelpObject("date");
+
+    return result;
+  }
+
+  let data = date();
+
+  result = createResultObject("date", "text", data, PROCESS_EXECUTED_SUCCESSFULLY);
 
   return result;
 }
@@ -338,7 +369,10 @@ function tokenizer(args) {
   }
 
   if(isQuote) {
-    console.log("throw quote error");
+    throw new TokenizerError(
+      `Argument should be enclosed in quotes.`,
+      INVALID_TOKEN
+    )
   }
 
   let command = tokens[0];
@@ -346,7 +380,6 @@ function tokenizer(args) {
 
   return { command, flags, options };
 }
-
 
 export function parse(args) {
   const cannotParseEmptyString = "Cannot parse an empty string!";
@@ -356,6 +389,7 @@ export function parse(args) {
   }
 
   let { command, flags, options } = tokenizer(args);
+
   let result = {};
 
   argumentHistory.push(args);
@@ -378,7 +412,7 @@ export function parse(args) {
         result = rmParse(options, flags);
         break;
       case "ls":
-        result = lsParse(flags);
+        result = lsParse(options, flags);
         break;
       case "cd":
         result = cdParse(options, flags);
@@ -401,14 +435,22 @@ export function parse(args) {
       case "tree":
         result = treeParse(flags);
         break;
+      case "date":
+        result = dateParse(options, flags);
+        break;
       default:
         result = invalidCommand;
         break;
     }
   } catch(err) {
-    console.log(err.message + ", " + err.code);
-    
-    return err;
+    return {
+      command: command,
+      type: "error",
+      entries: {
+        message: err.message,
+        code: err.code
+      }
+    };
   }
 
   return result;
@@ -457,3 +499,5 @@ cd("..");
 cd("..");
 cd("..");
 cd("..");
+
+console.clear();

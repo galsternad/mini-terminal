@@ -6,7 +6,7 @@ export function pwd() {
   if(cwd === ROOT) {
     return "/";
   }
-  
+
   let currentWorkingDirectory = cwd;
   let currentWorkingDirectoryArr = [];
   currentWorkingDirectoryArr.push(cwd.name);

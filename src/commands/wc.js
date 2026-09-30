@@ -1,6 +1,9 @@
 "use strict"
 
-import { getFile } from "../helpers.js";
+import { FileSystemError } from "../constructors/Error.js";
+import { checkIfFileExists, getFile, isNameUndefinedOrEmpty, splitPathAndName } from "../helpers.js";
+import { resolvePath } from "../pathResolver.js";
+import { FILE_INVALID_NAME, FILE_NOT_FOUND } from "../processCodes.js";
 
 function countLines(str) {
   const empty = 0;
@@ -34,13 +37,28 @@ function countWords(str) {
     .length;
 }
 
-export function wc(fileName) {
-  let file = getFile(fileName);
+export function wc(path, flags) {
+  let { name: fileName, pathTo } = splitPathAndName(path);
+  const invalidNameString = `Invalid name: '${fileName}'.`;
+  const fileNotFoundString = `File '${fileName}' not found.`;
 
-  if(file === null) {
-    return `'${fileName}' does not exist!`;
+  if(isNameUndefinedOrEmpty(fileName)) {
+    throw new FileSystemError(
+      invalidNameString,
+      FILE_INVALID_NAME
+    );
   }
 
+  let tmpCwd = resolvePath(pathTo);
+
+  if(!checkIfFileExists(fileName, tmpCwd)) {
+    throw new FileSystemError(
+      fileNotFoundString,
+      FILE_NOT_FOUND
+    );
+  }
+
+  let file = getFile(fileName, tmpCwd);
   let fileContent = file.content;
   let characters = fileContent.length;
   let lines = countLines(fileContent);

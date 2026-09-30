@@ -13,6 +13,6 @@ Implementing a simple terminal-like interface in JS. Currently supports the foll
 - [x] ```wc```,
 - [x] ```find```.
 - [x] ```tree```,
-- [ ] ```clear```.
+- [x] ```clear```.
 
 It comes with a simple, terminal-like UI.

@@ -84,5 +84,12 @@
     "flags": {
       "h": "-h: Print help."
     }
+  },
+  "date": {
+    "description": "",
+    "usage": "",
+    "flags": {
+      "h": "-h: Print help."
+    }
   }
 }
