@@ -23,7 +23,7 @@
 }
 
 * {
-  background-color: black;
+  background-color: #232323;
   color: white;
   font-family: "Ubuntu Mono", monospace;
   font-size: 1.1rem;
@@ -41,7 +41,7 @@
 }
 
 .cli-label {
-  color: green;
+  color: lightskyblue;
   margin-right: 0.5rem;
   display: inline;
 }

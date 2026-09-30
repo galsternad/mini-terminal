@@ -45,6 +45,28 @@ export function getFile(fileName, tmpCwd) {
   return tmpCwd.children.get(fileName);
 }
 
+export function isDirectoryNameValid(name) {
+  const regexPattern = "^[a-zA-Z]+[a-zA-Z0-9_-]*$";
+  const regex = new RegExp(regexPattern);
+
+  if(!regex.test(name)) {
+    return false;
+  }
+
+  return true;
+}
+
+export function isFileNameValid(name) {
+  const regexPattern = "^[a-zA-Z]+[a-zA-Z0-9_-]*\\.{1}[a-zA-Z0-9]+$";
+  const regex = new RegExp(regexPattern);
+
+  if(!regex.test(name)) {
+    return false;
+  }
+
+  return true;
+}
+
 export function splitPathAndName(path) {
   // TODO:
   // better solution

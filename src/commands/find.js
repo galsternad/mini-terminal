@@ -25,8 +25,8 @@ function buildFindString(child) {
   return result;
 }
 
-function callFindRecursive(target, directory, str) {
-  for(let child of directory.children.values()) {
+function callFindRecursive(target, currentDirectory, str) {
+  for(let child of currentDirectory.children.values()) {
     if(child.name.includes(target)) {
       str += buildFindString(child);
     }
@@ -40,8 +40,8 @@ function callFindRecursive(target, directory, str) {
 }
 
 export function find(target) {
-  let directory = cwd;
-  let result = callFindRecursive(target, directory, "");
+  let currentDirectory = cwd;
+  let result = callFindRecursive(target, currentDirectory, "");
 
   if(result.length === 0) {
     return `Couldn't find '${target}'!`;

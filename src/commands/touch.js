@@ -4,6 +4,7 @@ import { cwd } from "../fileState.js";
 import { File } from "../constructors/File.js";
 import {
   checkIfDirectoryOrFileExists, 
+  isFileNameValid, 
   isNameUndefinedOrEmpty,
   splitPathAndName
 } from "../helpers.js";
@@ -21,7 +22,7 @@ export function touch(path) {
   const invalidNameString = `Invalid name: '${fileName}'.`;
   const directoryOrFileAlreadyExistsString = `Directory or file '${fileName}' already exists.`; 
 
-  if(isNameUndefinedOrEmpty(fileName)) {
+  if(isNameUndefinedOrEmpty(fileName) || !isFileNameValid(fileName)) {
     throw new FileSystemError(
       invalidNameString,
       FILE_INVALID_NAME

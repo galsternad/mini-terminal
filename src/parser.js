@@ -155,8 +155,8 @@ function catParse(options, flags) {
     return result;
   }
 
-  let fileName = options[0];
-  let data = cat(fileName, flags);
+  let path = options[0];
+  let data = cat(path, flags);
 
   result = createResultObject("cat", "text", data, PROCESS_EXECUTED_SUCCESSFULLY);
 
@@ -174,10 +174,12 @@ function wcParse(options, flags) {
     return result;
   }
   
-  let fileName = options[0];
-  let data = wc(fileName);
+  let path = options[0];
+  let data = wc(path, flags);
   
   result = createResultObject("wc", "text", data, PROCESS_EXECUTED_SUCCESSFULLY);
+
+  return result;
 }
 
 function writeParse(options, flags) {

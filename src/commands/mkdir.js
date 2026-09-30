@@ -3,6 +3,7 @@
 import { Directory } from "../constructors/Directory.js";
 import {
   checkIfDirectoryOrFileExists,
+  isDirectoryNameValid,
   isNameUndefinedOrEmpty,
   splitPathAndName
 } from "../helpers.js";
@@ -20,7 +21,7 @@ export function mkdir(path) {
   const invalidNameString = `Invalid name: '${directoryName}'.`;
   const directoryOrFileAlreadyExistsString = `Directory or file '${directoryName}' already exists.`; 
 
-  if(isNameUndefinedOrEmpty(directoryName)) {
+  if(isNameUndefinedOrEmpty(directoryName) || !isDirectoryNameValid(directoryName)) {
     throw new DirectorySystemError(
       invalidNameString,
       DIRECTORY_INVALID_NAME

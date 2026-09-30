@@ -21,7 +21,7 @@ export function rmdir(path) {
   let { name: directoryName, pathTo } = splitPathAndName(path);
 
   const invalidNameString = `Invalid name: '${directoryName}'.`;
-  const directoryNotFoundString = `Directory '${directoryName}' does not exist.`;
+  const directoryNotFoundString = `Directory '${directoryName}' not found.`;
   const directoryNotEmptyString = `Cannot delete a non-empty directory '${directoryName}'.`;
 
   if(isNameUndefinedOrEmpty(directoryName)) {
