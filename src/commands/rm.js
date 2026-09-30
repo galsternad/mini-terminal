@@ -36,7 +36,10 @@ export function rm(path) {
     );
   }
 
+  let file = getFile(fileName, tmpCwd);
+
   tmpCwd.children.delete(fileName);
+  tmpCwd.size -= file.size;
   tmpCwd.lastModified = Date.now();
 
   return FILE_REMOVED_SUCCESSFULLY;

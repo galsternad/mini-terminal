@@ -38,6 +38,7 @@ export function mkdir(path) {
   }
 
   let newDirectory = new Directory(directoryName, tmpCwd);
+  newDirectory.size += directoryName.length;
   tmpCwd.children.set(directoryName, newDirectory);
   tmpCwd.lastModified = Date.now();
 

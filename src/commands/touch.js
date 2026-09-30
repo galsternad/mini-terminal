@@ -39,7 +39,9 @@ export function touch(path) {
   }
 
   let newFile = new File(fileName, tmpCwd);
+  newFile.size += fileName.length;
   tmpCwd.children.set(fileName, newFile);
+  tmpCwd.size += newFile.size;
   tmpCwd.lastModified = Date.now();
 
   return FILE_CREATED_SUCCESSFULLY;

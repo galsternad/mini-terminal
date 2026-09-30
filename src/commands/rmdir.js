@@ -17,7 +17,7 @@ import {
 } from "../helpers.js";
 import { resolvePath } from "../pathResolver.js";
 
-export function rmdir(path) {
+export function rmdir(path, flags) {
   let { name: directoryName, pathTo } = splitPathAndName(path);
 
   const invalidNameString = `Invalid name: '${directoryName}'.`;
@@ -48,9 +48,11 @@ export function rmdir(path) {
       DIRECTORY_NOT_EMPTY
     )
   }
-
+  
   tmpCwd.children.delete(directoryName);
   tmpCwd.lastModified = Date.now();
+  tmpCwd.parent.size -= tmpCwd.size;
+  tmpCwd.parent.lastModified = Date.now();
 
   return DIRECTORY_REMOVED_SUCCESSFULLY;
 }

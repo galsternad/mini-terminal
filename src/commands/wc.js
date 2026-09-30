@@ -62,15 +62,24 @@ export function wc(path, flags) {
   let fileContent = file.content;
   let characters = fileContent.length;
   let lines = countLines(fileContent);
-
-  // clean up for the lines and words count
-  fileContent = fileContent.replace(/\s+/g, " ").trim();
   let words = countWords(fileContent);
 
-  let result = 
-    `characters: ${characters}\n` +
-    `words: ${words}\n` +
-    `lines: ${lines}`;
+  let result = new Map();
+
+  const hasNoCountFlags = 
+    !flags.has("c") &&
+    !flags.has("l") &&
+    !flags.has("w");
+
+  if(hasNoCountFlags || flags.has("c")) {
+    result.set("characters", characters);
+  }
+  if(hasNoCountFlags || flags.has("l")) {
+    result.set("lines", lines);
+  }
+  if(hasNoCountFlags || flags.has("w")) {
+    result.set("words", words);
+  }
 
   return result;
 }

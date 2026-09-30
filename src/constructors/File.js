@@ -5,6 +5,7 @@ export function File(
   parent,
   type = "file",
   content = "",
+  size = 0,
   createdAt = Date.now(),
   lastModified = Date.now()
 ) {
@@ -12,6 +13,7 @@ export function File(
   this.parent = parent;
   this.type = type;
   this.content = content;
+  this.size = size;
   this.createdAt = createdAt;
   this.lastModified = lastModified;
 }

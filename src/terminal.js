@@ -54,7 +54,7 @@ function createNewCliResult(str) {
 
   let cliResult = document.createElement("pre");
   cliResult.classList.add("cli-result");
-  cliResult.textContent = result;
+  cliResult.textContent = result.data;
 
   return cliResult;
 }

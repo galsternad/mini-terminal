@@ -34,7 +34,10 @@ export function write(path, content) {
     file.content += `\n${content}`
   }
 
+  file.size += content.length;
   file.lastModified = Date.now();
+  file.parent.size += content.length;
+  file.parent.lastModified = Date.now();
 
   return FILE_MODIFIED_SUCCESSFULLY;
 }

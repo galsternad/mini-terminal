@@ -102,7 +102,7 @@ export function createHelpObject(command) {
   let flagsArray = [];
 
   for(let flag of Object.values(commandHelpObject["flags"])) {
-    flagsArray.push();
+    flagsArray.push(flag);
   } 
 
   result = {
@@ -113,7 +113,7 @@ export function createHelpObject(command) {
       usage: commandHelpObject["usage"],
       flags: flagsArray
     }
-  }
+  };
 
   return result;
 }
@@ -124,5 +124,16 @@ export function createResultObject(command, type, data, code) {
     type: type,
     data: data,
     code: code
+  };
+}
+
+export function createErrorObject(command, type, error) {
+  return {
+    command: command,
+    type: type,
+    data: {
+      message: error.message,
+      code: error.code
+    }
   };
 }

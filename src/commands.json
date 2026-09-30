@@ -10,24 +10,34 @@
     }
   },
   "cd": {
-    "description": "Changes the current working directory.",
+    "description": "Changes the current working directory. If no argument is specified, changes the current working directory to 'root'.",
     "usage": "cd [OPTIONS] <directory>",
     "flags": {
-
+      "h": "-h: Print help."
+    }
+  },
+  "date": {
+    "description": "Prints the current date.",
+    "usage": "date [OPTIONS]",
+    "flags": {
+      "h": "-h: Print help."
     }
   },
   "find": {
-    "description": "",
-    "usage": "",
+    "description": "Finds a specified file and returns its path(s).",
+    "usage": "find [OPTIONS] <file>",
     "flags": {
-
+      "h": "-h: Print help."
     }
   },
   "ls": {
     "description": "Displays the content of a directory.",
     "usage": "ls [OPTIONS] [DIRECTORY]",
     "flags": {
-      "l": "-l: Print long.",
+      "d": "-d: Only print directories.",
+      "f": "-f: Only print files.",
+      "l": "-l: Print long listing.",
+      "T": "-T: Sort by time, newest first.",
       "h": "-h: Print help."
     }
   },
@@ -39,55 +49,53 @@
     }
   },
   "pwd": {
-    "description": "",
-    "usage": "",
-    "flags": { }
+    "description": "Prints the current working directory.",
+    "usage": "pwd [OPTIONS]",
+    "flags": {
+      "h": "-h: Print help."
+    }
   },
   "rm": {
-    "description": "",
-    "usage": "",
+    "description": "Removes a specified file.",
+    "usage": "rm [OPTIONS] <file>",
     "flags": {
       "h": "-h: Print help."
     }
   },
   "rmdir": {
-    "description": "",
-    "usage": "",
+    "description": "Removes a specified directory, if it's empty.",
+    "usage": "rmdir [OPTIONS] <directory>",
     "flags": {
       "h": "-h: Print help."
     }
   },
   "touch": {
-    "description": "",
-    "usage": "",
+    "description": "Creates a new file.",
+    "usage": "touch [OPTIONS] <file>",
     "flags": {
       "h": "-h: Print help."
     }
   },
   "tree": {
-    "description": "",
-    "usage": "",
+    "description": "Prints the tree representation of the file system from the current working directory.",
+    "usage": "tree [OPTIONS]",
     "flags": {
       "h": "-h: Print help."
     }
   },
   "wc": {
-    "description": "",
-    "usage": "",
+    "description": "Shows the character, line and word count of a file.",
+    "usage": "wc [OPTIONS] <file>",
     "flags": {
+      "c": "-c: Show character count.",
+      "l": "-l: Show line count.",
+      "w": "-w: Show word count.",
       "h": "-h: Print help."
     }
   },
   "write": {
-    "description": "",
-    "usage": "",
-    "flags": {
-      "h": "-h: Print help."
-    }
-  },
-  "date": {
-    "description": "",
-    "usage": "",
+    "description": "Writes the given content to the specified file. If the file is not empty, it appends the given content to a new line.",
+    "usage": "write [OPTIONS] <file> \"content\"",
     "flags": {
       "h": "-h: Print help."
     }

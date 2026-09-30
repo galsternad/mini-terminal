@@ -18,7 +18,8 @@ import { TokenizerError } from "./constructors/Error.js";
 import { 
   createResultObject,
   checkValidFlags,
-  createHelpObject
+  createHelpObject,
+  createErrorObject
 } from "./helpers.js";
 import {
   PROCESS_EXECUTED_SUCCESSFULLY,
@@ -65,7 +66,7 @@ function rmdirParse(options, flags) {
   }
 
   let directoryName = options[0];
-  let code  = rmdir(directoryName);
+  let code = rmdir(directoryName);
   const directoryRemovedSuccesfully = `Directory '${directoryName}' successfully removed!`;
 
   result = createResultObject("rmdir", "text", directoryRemovedSuccesfully, code);
@@ -177,7 +178,7 @@ function wcParse(options, flags) {
   let path = options[0];
   let data = wc(path, flags);
   
-  result = createResultObject("wc", "text", data, PROCESS_EXECUTED_SUCCESSFULLY);
+  result = createResultObject("wc", "entries", data, PROCESS_EXECUTED_SUCCESSFULLY);
 
   return result;
 }
@@ -219,6 +220,8 @@ function cdParse(options, flags) {
   const cdSuccessful = `'cd' to '${directoryName}' successful!`;
 
   result = createResultObject("cd", "text", cdSuccessful, code);
+
+  return result;
 }
 
 function treeParse(flags) {
@@ -387,10 +390,21 @@ export function parse(args) {
   if(isArgumentsStringEmpty(args)) {
     return cannotParseEmptyString;
   }
-
-  let { command, flags, options } = tokenizer(args);
-
+  
   let result = {};
+  let command;
+  let flags;
+  let options;
+
+  try {
+    ({command, flags, options } = tokenizer(args));
+  } catch(error) {
+    result = createResultObject(command, "error", error);
+  }
+
+  console.log(command);
+  console.log(flags);
+  console.log(options);
 
   argumentHistory.push(args);
   argumentHistory.index = argumentHistory.length;
@@ -439,18 +453,11 @@ export function parse(args) {
         result = dateParse(options, flags);
         break;
       default:
-        result = invalidCommand;
+        result = createResultObject(command, "text", invalidCommand, PROCESS_EXECUTED_SUCCESSFULLY);
         break;
     }
-  } catch(err) {
-    return {
-      command: command,
-      type: "error",
-      entries: {
-        message: err.message,
-        code: err.code
-      }
-    };
+  } catch(error) {
+    result = createErrorObject(command, "error", error);
   }
 
   return result;
@@ -474,7 +481,11 @@ touch("pic.jpg");
 touch("pic2.jpg");
 touch("pic3.jpg");
 touch("pic4.png");
+touch("n.txt");
+write("n.txt", "hello madafaka\n\n\nhello hello");
 cd("Projects");
+touch("f.txt");
+write("f.txt", "hello madafaka\n\n\nhello hello");
 mkdir("mini-terminal");
 cd("mini-terminal");
 mkdir("src");
